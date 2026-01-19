@@ -1,0 +1,72 @@
+---
+// src/pages/index.astro - Simple homepage using the Header and Footer
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+// Static data for the homepage (replace with Strapi fetches later)
+const hero = {
+  title: 'Empowering Trans Care for LGBTQ+ Communities',
+  subtitle: 'Resources, professional directories, and support for legal, medical, and psychological care.',
+  cta: 'Get Support',
+  ctaLink: '/support'
+};
+
+const programs = [
+  { title: 'Legal Assistance', description: 'Aid for name changes and rights.', link: '/programs/legal' },
+  { title: 'Medical Access', description: 'Gender-affirming healthcare support.', link: '/programs/medical' },
+  { title: 'Psychology Network', description: 'Affirming mental health resources.', link: '/programs/psychology' },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Non-Profit Name | Home</title>
+  </head>
+  <body>
+    <Header />
+
+    <main>
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="hero-content">
+          <h1>{hero.title}</h1>
+          <p>{hero.subtitle}</p>
+          <a href={hero.ctaLink} class="cta-button">{hero.cta}</a>
+        </div>
+      </section>
+
+      <!-- Sample Programs Section -->
+      <section class="programs">
+        <h2>Get Support</h2>
+        <div class="programs-grid">
+          {programs.map(program => (
+            <article class="program-card">
+              <h3>{program.title}</h3>
+              <p>{program.description}</p>
+              <a href={program.link}>Learn More</a>
+            </article>
+          ))}
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </body>
+</html>
+
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; }
+  .hero { background: #eee; padding: 4rem 2rem; text-align: center; }
+  .hero-content h1 { font-size: 2.5rem; }
+  .hero-content p { font-size: 1.2rem; margin-bottom: 1rem; }
+  .cta-button { background: #007bff; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 4px; }
+  .programs { padding: 2rem; text-align: center; }
+  .programs h2 { font-size: 2rem; margin-bottom: 1.5rem; }
+  .programs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
+  .program-card { border: 1px solid #ddd; padding: 1.5rem; border-radius: 8px; text-align: left; }
+  .program-card h3 { font-size: 1.25rem; }
+  .program-card a { color: #007bff; text-decoration: none; }
+</style>

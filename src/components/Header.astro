@@ -1,0 +1,77 @@
+---
+// src/components/Header.astro - Simple static header with logo, 5 sample nav items, and CTA button
+---
+
+<header class="header">
+  <div class="container">
+    <div class="logo">
+      <a href="/">Your Non-Profit Name</a> <!-- Customize with your logo text or add <img> for image -->
+    </div>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/support">Get Support</a></li>
+        <li><a href="/directory">Professional Directory</a></li>
+        <li><a href="/blog">Blog</a></li>
+        <li><a href="/about">About Us</a></li>
+      </ul>
+    </nav>
+    <a href="/donate" class="cta-button">Donate Now</a>
+  </div>
+</header>
+
+<style>
+  .header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+  }
+  .logo a {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+  }
+  .main-nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 1.5rem;
+  }
+  .main-nav a {
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .cta-button {
+    background: #007bff;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  /* Basic responsiveness */
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .main-nav ul {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+</style>

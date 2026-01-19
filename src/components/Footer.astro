@@ -1,0 +1,104 @@
+---
+// src/components/Footer.astro - Keeping this as is from before, since you said it's perfect
+---
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-sections">
+      <div class="section">
+        <h4>About Us</h4>
+        <ul>
+          <li><a href="/about">Our Mission</a></li>
+          <li><a href="/team">Our Team</a></li>
+          <li><a href="/impact">Impact Reports</a></li>
+        </ul>
+      </div>
+      <div class="section">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="/patient-resources">Patient Resources</a></li>
+          <li><a href="/provider-resources">Provider Resources</a></li>
+          <li><a href="/blog">Blog & News</a></li>
+        </ul>
+      </div>
+      <div class="section">
+        <h4>Get Involved</h4>
+        <ul>
+          <li><a href="/donate">Donate</a></li>
+          <li><a href="/volunteer">Volunteer</a></li>
+          <li><a href="/partnerships">Partnerships</a></li>
+        </ul>
+      </div>
+      <div class="section">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="/contact">Contact Us</a></li>
+          <li><a href="/privacy">Privacy Policy</a></li>
+          <li><a href="/terms">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="social-media">
+      <a href="https://facebook.com/yourpage" aria-label="Facebook">Facebook</a>
+      <a href="https://twitter.com/yourhandle" aria-label="Twitter">Twitter</a>
+      <a href="https://instagram.com/yourhandle" aria-label="Instagram">Instagram</a>
+      <a href="https://youtube.com/yourchannel" aria-label="YouTube">YouTube</a>
+    </div>
+    <div class="copyright">
+      <p>&copy; {new Date().getFullYear()} Your Non-Profit Name. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background-color: #333;
+    color: white;
+    padding: 2rem 0;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  .footer-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  .section h4 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+  .section ul {
+    list-style: none;
+    padding: 0;
+  }
+  .section a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .social-media {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .social-media a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+  }
+  .copyright {
+    text-align: center;
+    font-size: 0.9rem;
+  }
+  @media (max-width: 768px) {
+    .footer-sections {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
