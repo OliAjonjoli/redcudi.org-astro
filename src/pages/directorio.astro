@@ -1,0 +1,28 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+---
+
+<MainLayout 
+  title="Directorio"
+  description="Directorio de profesionales LGBTQ+ verificados"
+  currentPage="/directory/"
+>
+  <section class="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-teal-light via-brand-green-light to-brand-purple-light">
+    <div class="section-container text-center py-20">
+      <h1 class="text-5xl md:text-6xl font-display font-bold text-brand-teal-dark mb-6">
+        Próximamente
+      </h1>
+      <p class="text-xl text-neutral-700 mb-8 max-w-2xl mx-auto">
+        Estamos trabajando en el directorio de profesionales. Pronto podrás explorar y conectar con profesionales verificados de la comunidad LGBTQ+.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/" class="btn-primary text-lg">
+          Volver al Inicio
+        </a>
+        <a href="/about/" class="btn-secondary text-lg">
+          Conocer Más
+        </a>
+      </div>
+    </div>
+  </section>
+</MainLayout>

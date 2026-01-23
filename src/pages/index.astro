@@ -1,72 +1,110 @@
 ---
-// src/pages/index.astro - Simple homepage using the Header and Footer
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
+import MainLayout from '../layouts/MainLayout.astro';
+import { Image } from 'astro:assets';
+import heroBG from '../assets/images/hero-flag-woman.jpg';
 
 // Static data for the homepage (replace with Strapi fetches later)
 const hero = {
-  title: 'Empowering Trans Care for LGBTQ+ Communities',
-  subtitle: 'Resources, professional directories, and support for legal, medical, and psychological care.',
-  cta: 'Get Support',
-  ctaLink: '/support'
+  title: 'Empoderando a la Comunidad LGBTQ+ con Profesionales de Confianza',
+  subtitle: 'Encuentra profesionales de salud, expertos legales y proveedores de servicios verificados, recomendados por y para la comunidad trans y LGBTQ+.',
+  cta: 'Explorar Directorio',
+  ctaLink: '/directory/'
 };
 
-const programs = [
-  { title: 'Legal Assistance', description: 'Aid for name changes and rights.', link: '/programs/legal' },
-  { title: 'Medical Access', description: 'Gender-affirming healthcare support.', link: '/programs/medical' },
-  { title: 'Psychology Network', description: 'Affirming mental health resources.', link: '/programs/psychology' },
+const features = [
+  { 
+    title: 'Profesionales Verificados',
+    description: 'Todos los profesionales están verificados por su aceptación LGBTQ+ y calidad de atención.',
+    icon: '✓'
+  },
+  { 
+    title: 'Especialistas en Salud',
+    description: 'Conecta con terapeutas, doctores y proveedores de salud que afirman nuestra identidad.',
+    icon: '💚'
+  },
+  { 
+    title: 'Servicios de Apoyo',
+    description: 'Encuentra abogados, contadores y otros profesionales que comprenden nuestra comunidad.',
+    icon: '🤝'
+  },
+  { 
+    title: 'Impulsado por la Comunidad',
+    description: 'Recomendaciones de y para la comunidad LGBTQ+.',
+    icon: '🏳️‍⚧️'
+  },
 ];
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Your Non-Profit Name | Home</title>
-  </head>
-  <body>
-    <Header />
-
-    <main>
-      <!-- Hero Section -->
-      <section class="hero">
-        <div class="hero-content">
-          <h1>{hero.title}</h1>
-          <p>{hero.subtitle}</p>
-          <a href={hero.ctaLink} class="cta-button">{hero.cta}</a>
+<MainLayout 
+  title="Inicio"
+  description="Encuentra profesionales de confianza amigables con LGBTQ+ - servicios de salud, legales y de apoyo"
+  currentPage="/"
+>
+  <!-- Hero Section -->
+  <section class="relative py-20 md:py-32 overflow-hidden">
+    {/* Background image */}
+    <Image 
+      src={heroBG} 
+      alt="LGBTQ+ community"
+      class="absolute inset-0 w-full h-full object-cover -z-10"
+    />
+    {/* Overlay for text readability */}
+    <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-black/40 -z-10"></div>
+    
+    <div class="section-container relative z-10">
+      <div class="max-w-3xl">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-6">
+          {hero.title}
+        </h1>
+        <p class="text-xl text-neutral-100 mb-8 leading-relaxed">
+          {hero.subtitle}
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a href={hero.ctaLink} class="btn-primary text-lg">
+            {hero.cta}
+          </a>
+          <a href="/about/" class="btn-secondary text-lg">
+            Saber Más
+          </a>
         </div>
-      </section>
+      </div>
+    </div>
+  </section>
 
-      <!-- Sample Programs Section -->
-      <section class="programs">
-        <h2>Get Support</h2>
-        <div class="programs-grid">
-          {programs.map(program => (
-            <article class="program-card">
-              <h3>{program.title}</h3>
-              <p>{program.description}</p>
-              <a href={program.link}>Learn More</a>
-            </article>
-          ))}
+  <!-- Features Section -->
+  <section class="section-container">
+    <div class="text-center mb-12">
+      <h2 class="section-title">¿Por Qué Elegir redcudi.org?</h2>
+      <p class="section-subtitle">Un directorio construido por y para la comunidad LGBTQ+</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {features.map((feature) => (
+        <div class="card-hover">
+          <div class="text-4xl mb-4">{feature.icon}</div>
+          <h3 class="font-display font-bold text-lg text-brand-teal-dark mb-2">
+            {feature.title}
+          </h3>
+          <p class="text-neutral-600 text-sm">
+            {feature.description}
+          </p>
         </div>
-      </section>
-    </main>
+      ))}
+    </div>
+  </section>
 
-    <Footer />
-  </body>
-</html>
-
-<style>
-  body { font-family: Arial, sans-serif; margin: 0; }
-  .hero { background: #eee; padding: 4rem 2rem; text-align: center; }
-  .hero-content h1 { font-size: 2.5rem; }
-  .hero-content p { font-size: 1.2rem; margin-bottom: 1rem; }
-  .cta-button { background: #007bff; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 4px; }
-  .programs { padding: 2rem; text-align: center; }
-  .programs h2 { font-size: 2rem; margin-bottom: 1.5rem; }
-  .programs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
-  .program-card { border: 1px solid #ddd; padding: 1.5rem; border-radius: 8px; text-align: left; }
-  .program-card h3 { font-size: 1.25rem; }
-  .program-card a { color: #007bff; text-decoration: none; }
-</style>
+  <!-- CTA Section -->
+  <section class="bg-brand-purple-dark text-white py-16">
+    <div class="section-container text-center">
+      <h2 class="text-3xl md:text-4xl font-display font-bold mb-4">
+        ¿Listo para Encontrar Apoyo?
+      </h2>
+      <p class="text-lg text-brand-purple-light mb-8 max-w-2xl mx-auto">
+        Explora nuestro directorio de profesionales verificados que comprenden y apoyan a la comunidad LGBTQ+.
+      </p>
+      <a href="/directory/" class="inline-block bg-white text-brand-purple-dark font-semibold px-8 py-4 rounded-lg hover:bg-neutral-100 transition-colors">
+        Explorar Directorio
+      </a>
+    </div>
+  </section>
+</MainLayout>

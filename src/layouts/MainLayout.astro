@@ -1,7 +1,15 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-const { title } = Astro.props; // Pass props like title from pages
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  currentPage?: string;
+}
+
+const { title, description = 'redcudi.org - Find trusted LGBTQ+ friendly professionals', currentPage } = Astro.props;
 ---
 
 <!doctype html>
@@ -9,19 +17,15 @@ const { title } = Astro.props; // Pass props like title from pages
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title || 'Your Non-Profit Name'}</title>
+    <meta name="description" content={description} />
+    <title>{title} | redcudi.org</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
-  <body>
-    <Header />
+  <body class="bg-white text-neutral-900">
+    <Header currentPage={currentPage} />
     <main>
-      <slot /> <!-- Page content goes here -->
+      <slot />
     </main>
     <Footer />
   </body>
 </html>
-
-<style>
-  /* Global styles if needed */
-  body { font-family: Arial, sans-serif; margin: 0; }
-  main { padding: 2rem; }
-</style>

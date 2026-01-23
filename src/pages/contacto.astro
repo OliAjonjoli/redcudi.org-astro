@@ -1,0 +1,28 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+---
+
+<MainLayout 
+  title="Contacto"
+  description="Ponte en contacto con redcudi.org"
+  currentPage="/contact/"
+>
+  <section class="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-orange-light via-brand-teal-light to-brand-green-light">
+    <div class="section-container text-center py-20">
+      <h1 class="text-5xl md:text-6xl font-display font-bold text-brand-orange-dark mb-6">
+        Próximamente
+      </h1>
+      <p class="text-xl text-neutral-700 mb-8 max-w-2xl mx-auto">
+        Nuestro formulario de contacto estará disponible pronto. Podrás comunicarte con nosotres para consultas y colaboraciones.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/" class="btn-primary text-lg">
+          Volver al Inicio
+        </a>
+        <a href="/directory/" class="btn-secondary text-lg">
+          Ver Directorio
+        </a>
+      </div>
+    </div>
+  </section>
+</MainLayout>

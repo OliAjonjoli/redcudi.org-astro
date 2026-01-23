@@ -1,77 +1,105 @@
 ---
-// src/components/Header.astro - Simple static header with logo, 5 sample nav items, and CTA button
+interface Props {
+  currentPage?: string;
+}
+
+const { currentPage } = Astro.props;
+
+const navItems = [
+  { label: 'Inicio', href: '/' },
+  { label: 'Directorio', href: '/directorio/' },
+  { label: 'Nosotres', href: '/nosotres/' },
+  { label: 'Contacto', href: '/contacto/' },
+];
 ---
 
-<header class="header">
-  <div class="container">
-    <div class="logo">
-      <a href="/">Your Non-Profit Name</a> <!-- Customize with your logo text or add <img> for image -->
+<header class="sticky top-0 z-50 w-full bg-white border-b border-neutral-200 shadow-sm">
+  <nav class="section-container flex justify-between items-center py-4">
+    <!-- Logo/Brand -->
+    <div class="flex-shrink-0">
+      <a href="/" class="text-2xl font-display font-bold text-brand-teal-dark hover:text-brand-teal-base transition-colors">
+        redcudi
+      </a>
+      <p class="text-xs text-brand-purple-dark font-semibold tracking-wide">Red de Cuidado Diverso</p>
     </div>
-    <nav class="main-nav">
-      <ul>
-        <li><a href="/">Inicio</a></li>
-        <li><a href="/support">Quienes Somos?</a></li>
-        <li><a href="/directory">Directorio</a></li>
-        <li><a href="/blog">Blog</a></li>
-        <li><a href="/about">Nosotros</a></li>
-      </ul>
-    </nav>
-    <a href="/donate" class="cta-button">Donate Now</a>
+
+    <!-- Desktop Navigation -->
+    <div class="hidden md:flex items-center gap-8">
+      {navItems.map((item) => (
+        <a
+          href={item.href}
+          class={`font-medium transition-colors ${
+            currentPage === item.href
+              ? 'text-brand-teal-dark'
+              : 'text-neutral-700 hover:text-brand-teal-dark'
+          }`}
+        >
+          {item.label}
+        </a>
+      ))}
+    </div>
+
+    <!-- CTA Button (Desktop) -->
+    <div class="hidden md:block">
+      <a href="/directory/" class="btn-primary text-sm">
+        Buscar Profesionales
+      </a>
+    </div>
+
+    <!-- Mobile Menu Button -->
+    <button
+      id="mobile-menu-btn"
+      class="md:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors"
+      aria-label="Toggle menu"
+    >
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </nav>
+
+  <!-- Mobile Navigation (Hidden by default) -->
+  <div
+    id="mobile-menu"
+    class="hidden md:hidden border-t border-neutral-200 bg-white"
+  >
+    <div class="section-container text-center py-4 space-y-3">
+      {navItems.map((item) => (
+        <a
+          href={item.href}
+          class={`block py-3 px-3 font-medium transition-all rounded-lg ${
+            currentPage === item.href
+              ? 'text-neutral-900 bg-neutral-200'
+              : 'text-neutral-700 hover:text-brand-teal-dark hover:bg-neutral-100'
+          }`}
+        >
+          {item.label}
+        </a>
+      ))}
+      <div class="pt-4 border-t border-neutral-200">
+        <a href="/directory/" class="btn-primary w-full text-center text-sm block">
+          Buscar Profesionales
+        </a>
+      </div>
+    </div>
   </div>
 </header>
 
-<style>
-  .header {
-    background-color: #ffffff;
-    border-bottom: 1px solid #ddd;
-    padding: 1rem 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+<script>
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  if (menuBtn && mobileMenu) {
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Close menu when clicking on a link
+    const menuLinks = mobileMenu.querySelectorAll('a');
+    menuLinks.forEach((link) => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+      });
+    });
   }
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 1rem;
-  }
-  .logo a {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-    text-decoration: none;
-  }
-  .main-nav ul {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    gap: 1.5rem;
-  }
-  .main-nav a {
-    color: #333;
-    text-decoration: none;
-    font-weight: 500;
-  }
-  .cta-button {
-    background: #007bff;
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  /* Basic responsiveness */
-  @media (max-width: 768px) {
-    .container {
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .main-nav ul {
-      flex-direction: column;
-      gap: 1rem;
-    }
-  }
-</style>
+</script>
