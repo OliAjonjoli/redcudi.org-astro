@@ -118,14 +118,20 @@ yarn-error.log
 coverage
 
 ############################
-# Strapi
+# Environment & Build
 ############################
 
 .env
-license.txt
-exports
-.strapi
+.env.*
+!.env.example
 dist
 build
-.strapi-updater.json
-.strapi-cloud.json
+
+############################
+# Deployment
+############################
+
+.prod/
+.dev/
+docker-compose*.yml
+!docker-compose.example.yml
