@@ -14,10 +14,23 @@ COPY . .
 # Build Astro static site
 RUN npm run build
 
-# Use a lightweight server for serving static files
-RUN npm install -g serve
+# Use nginx for serving static files with proper routing
+FROM nginx:alpine
+
+# Copy built files to nginx
+COPY --from=0 /app/dist /usr/share/nginx/html
+
+# Create nginx configuration for Astro
+RUN echo 'server { \
+    listen 3000; \
+    server_name _; \
+    root /usr/share/nginx/html; \
+    index index.html; \
+    location / { \
+        try_files $uri $uri/ $uri.html /index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
 
 EXPOSE 3000
 
-# Serve the built Astro site
-CMD ["serve", "-s", "dist", "-l", "3000"]
+CMD ["nginx", "-g", "daemon off;"]
