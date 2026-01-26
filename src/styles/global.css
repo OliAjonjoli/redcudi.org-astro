@@ -21,6 +21,15 @@
     font-family: Poppins, system-ui, sans-serif;
     font-weight: 700;
   }
+
+  @keyframes subtle-zoom {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.05);
+    }
+  }
 }
 
 @layer components {
@@ -149,5 +158,44 @@
   .card-hover:hover {
     box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
     transform: translateY(-0.25rem);
+  }
+
+  .profile-image-hover {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .profile-image-hover:hover {
+    animation: subtle-zoom 0.3s ease-in-out forwards;
+  }
+
+  /* Pronoun Color Classes */
+  .pronoun-ella {
+    background-color: #ffc0cb;
+    color: #c71585;
+  }
+
+  .pronoun-el {
+    background-color: #87ceeb;
+    color: #1e90ff;
+  }
+
+  .pronoun-neutral-orange {
+    background-color: #ffe4b5;
+    color: #ff8c00;
+  }
+
+  .pronoun-neutral-green {
+    background-color: #90ee90;
+    color: #228b22;
+  }
+
+  .pronoun-neutral-yellow {
+    background-color: #ffff99;
+    color: #daa520;
+  }
+
+  .pronoun-neutral-purple {
+    background-color: #dda0dd;
+    color: #663399;
   }
 }

@@ -1,4 +1,5 @@
 ---
+import { Icon } from 'astro-icon/components';
 const currentYear = new Date().getFullYear();
 ---
 
@@ -10,39 +11,39 @@ const currentYear = new Date().getFullYear();
       <div>
         <h3 class="text-xl font-display font-bold text-brand-teal-light mb-2">redcudi</h3>
         <p class="text-neutral-400 text-sm">
-          Connecting LGBTQ+ community with trusted health and professional services.
+          Conectando la comunidad LGBTQ+ con servicios de salud y profesionales de confianza.
         </p>
         <div class="flex gap-4 mt-4">
           <a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors" aria-label="Facebook">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            <Icon name="lucide:facebook" class="w-5 h-5" />
           </a>
           <a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors" aria-label="Twitter">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 002.856-3.515 10 10 0 01-2.836.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417a9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+            <Icon name="lucide:twitter" class="w-5 h-5" />
           </a>
           <a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors" aria-label="Instagram">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path fill="#000" d="M16.6915026,12.4744748 L16.6915026,12.4744748 C16.6915026,14.1140224 15.3891175,15.4144925 13.7606244,15.4144925 C12.1321313,15.4144925 10.8297462,14.1140224 10.8297462,12.4744748 C10.8297462,10.8349272 12.1321313,9.5344571 13.7606244,9.5344571 C15.3891175,9.5344571 16.6915026,10.8349272 16.6915026,12.4744748 Z"/><circle cx="17.3991" cy="9.0440559" r="0.8449708" fill="#000"/><path fill="#000" d="M13.7606244,10.8908027 C14.2266809,10.8908027 14.6016227,11.2620807 14.6016227,11.7270767 L14.6016227,13.2218729 C14.6016227,13.6868688 14.2266809,14.0581468 13.7606244,14.0581468 C13.294568,14.0581468 12.9196261,13.6868688 12.9196261,13.2218729 L12.9196261,11.7270767 C12.9196261,11.2620807 13.294568,10.8908027 13.7606244,10.8908027 Z"/></svg>
+            <Icon name="lucide:instagram" class="w-5 h-5" />
           </a>
         </div>
       </div>
 
       <!-- Quick Links -->
       <div>
-        <h4 class="font-semibold text-white mb-4">Navigation</h4>
+        <h4 class="font-semibold text-white mb-4">Navegación</h4>
         <ul class="space-y-2 text-sm">
-          <li><a href="/" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Home</a></li>
-          <li><a href="/directory/" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Directory</a></li>
-          <li><a href="/about/" class="text-neutral-400 hover:text-brand-teal-light transition-colors">About</a></li>
-          <li><a href="/contact/" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Contact</a></li>
+          <li><a href="/" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Inicio</a></li>
+          <li><a href="/directory/" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Directorio</a></li>
+          <li><a href="/about/" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Nosotres</a></li>
+          <li><a href="/contact/" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Contacto</a></li>
         </ul>
       </div>
 
       <!-- Resources -->
       <div>
-        <h4 class="font-semibold text-white mb-4">Resources</h4>
+        <h4 class="font-semibold text-white mb-4">Recursos</h4>
         <ul class="space-y-2 text-sm">
           <li><a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Blog</a></li>
-          <li><a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors">FAQ</a></li>
-          <li><a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Support</a></li>
+          <li><a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Preguntas Frecuentes</a></li>
+          <li><a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Soporte</a></li>
         </ul>
       </div>
 
@@ -50,17 +51,17 @@ const currentYear = new Date().getFullYear();
       <div>
         <h4 class="font-semibold text-white mb-4">Legal</h4>
         <ul class="space-y-2 text-sm">
-          <li><a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Privacy Policy</a></li>
-          <li><a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Terms of Service</a></li>
-          <li><a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Accessibility</a></li>
+          <li><a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Política de Privacidad</a></li>
+          <li><a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Términos de Servicio</a></li>
+          <li><a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors">Accesibilidad</a></li>
         </ul>
       </div>
     </div>
 
     <!-- Bottom Footer -->
     <div class="py-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-neutral-400">
-      <p>&copy; {currentYear} redcudi.org. Made with 🏳️‍⚧️ for the LGBTQ+ community.</p>
-      <p>A nonprofit dedicated to connecting trans and LGBTQ+ folks with trusted professionals.</p>
+      <p>&copy; {currentYear} redcudi.org. Hecho con ❤️ para la comunidad LGBTQ+.</p>
+      <p>Una organización sin fines de lucro dedicada a conectar personas trans y LGBTQ+ con profesionales de confianza.</p>
     </div>
   </div>
 </footer>

@@ -1,5 +1,127 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
+import { Icon } from 'astro-icon/components';
+import { getStaffMembers } from '../lib/strapi';
+
+// Fetch team members from Strapi at build time
+// If the API is unreachable or returns 403 (permissions), fall back to an empty list
+const staffResponse = await getStaffMembers().catch((error) => {
+  console.error('Error loading staff members from Strapi:', error);
+  return [];
+});
+
+// Normalize data: sort by order, map to a render-friendly shape
+// Strapi v5 returns flattened attributes by default; fall back to attributes for older formats
+const teamMembers = (staffResponse || [])
+  .map((item) => {
+    const attrs = (item as any).attributes ?? item; // support both shapes
+    
+    // Extract photo URL from Strapi media field
+    // Strapi v5 shape: item.photo.url or item.photo.formats.medium.url
+    // Strapi v4 shape: item.attributes.photo.data.attributes.url
+    const photoData = attrs?.photo?.data?.attributes || attrs?.photo;
+    const photoUrl = photoData?.formats?.medium?.url || photoData?.url || null;
+    const STRAPI_URL = import.meta.env.STRAPI_API_URL || 'http://localhost:1337';
+    const fullPhotoUrl = photoUrl ? `${STRAPI_URL}${photoUrl}` : null;
+    
+    // Extract social media - handle both v4 and v5 formats
+    // v5: attrs.social_media is the component object directly
+    // v4: attrs.social_media.data.attributes contains the component data
+    let socialMedia = attrs?.social_media || {};
+    if (socialMedia?.data?.attributes) {
+      socialMedia = socialMedia.data.attributes; // v4 format
+    }
+    
+    // Extract pronouns - handle both v4 and v5 formats
+    // v5: attrs.pronouns is an array of component objects with direct structure
+    // v4: attrs.pronouns.data is an array of component objects
+    let pronounsArray = attrs?.pronouns || [];
+    if (pronounsArray?.data) {
+      pronounsArray = pronounsArray.data; // v4 format
+    }
+    
+    // Get the value from pronouns
+    const pronounsValue = pronounsArray?.[0]?.value || '';
+    
+    // Process social media links - filter out null/empty values and the 'id' field
+    const activeSocialLinks = Object.entries(socialMedia || {})
+      .filter(([key, value]) => {
+        if (key === 'id' || !value) return false;
+        if (typeof value === 'string') return value.trim() !== '';
+        return true;
+      })
+      .map(([key, value]) => ({ platform: key, url: String(value) }));
+    
+    console.log(`Staff Member: ${attrs?.firstName} ${attrs?.lastName}`, {
+      pronounsRaw: attrs?.pronouns,
+      pronounsExtracted: pronounsValue,
+      socialMediaRaw: attrs?.social_media,
+      socialMediaExtracted: socialMedia,
+    });
+    
+    return {
+      id: item.id,
+      firstName: attrs?.firstName || '',
+      lastName: attrs?.lastName || '',
+      role: attrs?.role || '',
+      bio: attrs?.bio || '',
+      pronouns: pronounsValue,
+      socialMedia: activeSocialLinks, // Already processed and filtered!
+      order: attrs?.order ?? 0,
+      image: fullPhotoUrl || 'https://via.placeholder.com/300x300?text=Sin+Foto&fontSize=12&bgColor=E5D9F2&textColor=60579F',
+    };
+  })
+  .sort((a, b) => a.order - b.order);
+
+// Function to get pronoun color class
+function getPronounColorClass(pronouns: string): string {
+  if (pronouns.includes('ella') || pronouns.includes('femenino')) {
+    return 'pronoun-ella';
+  } else if (pronouns.includes('él') || pronouns.includes('masculino')) {
+    return 'pronoun-el';
+  } else {
+    // For neutral pronouns, randomize between colors
+    const neutralColors = ['pronoun-neutral-orange', 'pronoun-neutral-green', 'pronoun-neutral-yellow', 'pronoun-neutral-purple'];
+    return neutralColors[Math.floor(Math.random() * neutralColors.length)];
+  }
+}
+
+// Social media configuration for team members
+const socialMediaConfig: Record<string, { label: string; ariaLabel: string; icon: string }> = {
+  facebook: { label: 'Facebook', ariaLabel: 'Facebook de {name}', icon: 'lucide:facebook' },
+  instagram: { label: 'Instagram', ariaLabel: 'Instagram de {name}', icon: 'lucide:instagram' },
+  twitter: { label: 'Twitter', ariaLabel: 'Twitter de {name}', icon: 'lucide:twitter' },
+  tiktok: { label: 'TikTok', ariaLabel: 'TikTok de {name}', icon: 'lucide:music' },
+  linkedin: { label: 'LinkedIn', ariaLabel: 'LinkedIn de {name}', icon: 'lucide:linkedin' },
+  website: { label: 'Website', ariaLabel: 'Website de {name}', icon: 'lucide:globe' },
+  youtube: { label: 'YouTube', ariaLabel: 'YouTube de {name}', icon: 'lucide:youtube' },
+  bluesky: { label: 'Bluesky', ariaLabel: 'Bluesky de {name}', icon: 'lucide:cloud' },
+  threads: { label: 'Threads', ariaLabel: 'Threads de {name}', icon: 'lucide:message-circle' },
+  email: { label: 'Email', ariaLabel: 'Email de {name}', icon: 'lucide:mail' },
+};
+
+const coreValues = [
+  {
+    title: "Inclusión",
+    description: "Creamos espacios seguros y acogedores para toda la comunidad LGBTQ+",
+    icon: "🌈",
+  },
+  {
+    title: "Confianza",
+    description: "Conectamos con profesionales verificados y confiables de la salud",
+    icon: "🤝",
+  },
+  {
+    title: "Accesibilidad",
+    description: "Brindamos acceso equitativo a servicios de calidad para todas las personas",
+    icon: "♿",
+  },
+  {
+    title: "Empoderamiento",
+    description: "Apoyamos la autonomía y el bienestar de la comunidad trans y LGBTQ+",
+    icon: "✊",
+  },
+];
 ---
 
 <MainLayout 
@@ -7,20 +129,173 @@ import MainLayout from '../layouts/MainLayout.astro';
   description="Conoce más sobre redcudi.org"
   currentPage="/about/"
 >
-  <section class="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-purple-light via-brand-green-light to-brand-teal-light">
-    <div class="section-container text-center py-20">
-      <h1 class="text-5xl md:text-6xl font-display font-bold text-brand-purple-dark mb-6">
-        Próximamente
+  <!-- Hero Section -->
+  <section class="min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-brand-teal-dark via-brand-purple-base to-brand-green-dark pt-20 pb-12">
+    <div class="section-container text-center">
+      <h1 class="text-5xl md:text-6xl font-display font-bold text-white mb-6">
+        Nosotres
       </h1>
-      <p class="text-xl text-neutral-700 mb-8 max-w-2xl mx-auto">
-        Estamos preparando nuestra página "Nosotres" donde compartiremos nuestra misión, valores y la historia de redcudi.org.
+      <p class="text-xl text-neutral-100 max-w-2xl mx-auto">
+        Una organización sin fines de lucro dedicada a conectar la comunidad trans y LGBTQ+ con profesionales de salud confiables y servicios de calidad.
+      </p>
+    </div>
+  </section>
+
+  <!-- Mission & Vision Section -->
+  <section class="py-20 bg-white">
+    <div class="section-container">
+      <div class="grid md:grid-cols-2 gap-12">
+        <!-- Mission -->
+        <div class="bg-gradient-to-br from-brand-teal-light to-brand-teal-base p-8 rounded-lg">
+          <h2 class="text-3xl font-display font-bold text-brand-teal-dark mb-4">
+            Misión
+          </h2>
+          <p class="text-neutral-700 text-lg leading-relaxed">
+            Facilitar el acceso a servicios de salud y profesionales especializados que respeten la identidad de género y orientación sexual, en un ambiente inclusivo y libre de discriminación para la comunidad trans y LGBTQ+.
+          </p>
+        </div>
+
+        <!-- Vision -->
+        <div class="bg-gradient-to-br from-brand-purple-light to-brand-purple-base p-8 rounded-lg">
+          <h2 class="text-3xl font-display font-bold text-brand-purple-dark mb-4">
+            Visión
+          </h2>
+          <p class="text-neutral-700 text-lg leading-relaxed">
+            Ser una plataforma de referencia que empodera a personas LGBTQ+ para acceder a atención médica de calidad, contribuyendo a una sociedad más inclusiva, equitativa y respetuosa con la diversidad.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Values Section -->
+  <section class="py-20 bg-neutral-50">
+    <div class="section-container">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-display font-bold text-neutral-900 mb-4">
+          Nuestros Valores
+        </h2>
+        <p class="text-lg text-neutral-600 max-w-2xl mx-auto">
+          Los principios que guían nuestro trabajo y definen quiénes somos como organización.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {coreValues.map((value) => (
+          <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border-t-4 border-brand-teal-base">
+            <div class="text-4xl mb-4">{value.icon}</div>
+            <h3 class="text-xl font-display font-bold text-neutral-900 mb-3">
+              {value.title}
+            </h3>
+            <p class="text-neutral-600">
+              {value.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="py-20 bg-white">
+    <div class="section-container">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-display font-bold text-neutral-900 mb-4">
+          Nuestro Equipo
+        </h2>
+        <p class="text-lg text-neutral-600 max-w-2xl mx-auto">
+          Personas comprometidas con la inclusión y el bienestar de la comunidad LGBTQ+.
+        </p>
+      </div>
+
+      <!-- Team Members Alternating Layout -->
+      <div class="space-y-20">
+        {teamMembers.map((member, index) => {
+          const fullName = `${member.firstName} ${member.lastName}`.trim();
+          const pronounColorClass = getPronounColorClass(member.pronouns);
+          
+          return (
+            <div class={`grid md:grid-cols-2 gap-8 md:gap-12 items-center ${index % 2 === 1 ? 'md:auto-cols-max md:[direction:rtl]' : ''}`}>
+              {/* Content */}
+              <div class={index % 2 === 1 ? 'md:[direction:ltr]' : ''}>
+                <h3 class="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-1">
+                  {fullName || 'Nombre del Miembro'}
+                </h3>
+                {member.pronouns && (
+                  <p class={`text-sm font-semibold px-3 py-1 rounded-full inline-block mb-3 ${pronounColorClass}`}>
+                    {member.pronouns}
+                  </p>
+                )}
+                <p class="text-lg font-semibold text-brand-teal-base mb-4">
+                  {member.role || 'Posición/Rol'}
+                </p>
+                <p class="text-neutral-600 text-lg leading-relaxed mb-6">
+                  {member.bio || 'Biografía no disponible'}
+                </p>
+                
+                {/* Social Media Links */}
+                {member.socialMedia.length > 0 && (
+                  <div class="flex gap-3">
+                    {member.socialMedia.map(({ platform, url }) => {
+                      const config = socialMediaConfig[platform];
+                      const href = platform === 'email' ? `mailto:${url}` : url;
+                      const target = platform === 'email' ? '_self' : '_blank';
+                      
+                      return (
+                        <a
+                          href={href}
+                          target={target}
+                          rel={platform === 'email' ? '' : 'noopener noreferrer'}
+                          aria-label={config?.ariaLabel.replace('{name}', fullName) || platform}
+                          class="p-2 rounded-full bg-neutral-100 text-neutral-600 hover:bg-brand-teal-base hover:text-white transition-all inline-flex items-center justify-center"
+                          title={config?.label}
+                        >
+                          {config?.icon && <Icon name={config.icon} class="w-5 h-5" />}
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Image / Placeholder */}
+              <div class={index % 2 === 1 ? 'md:[direction:ltr]' : ''}>
+                <div class="bg-gradient-to-br from-brand-purple-light to-brand-teal-light rounded-lg overflow-hidden h-72 md:h-96 flex items-center justify-center profile-image-hover">
+                  {member.image && member.image.startsWith('http') ? (
+                    <img 
+                      src={member.image} 
+                      alt={fullName || 'Miembro del equipo'}
+                      class="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div class="text-white text-4xl font-display">
+                      {fullName ? fullName.split(' ').map((p) => p[0]).join('').slice(0, 2) : '🌈'}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action Section -->
+  <section class="py-16 bg-gradient-to-r from-brand-green-base to-brand-teal-base">
+    <div class="section-container text-center">
+      <h2 class="text-3xl md:text-4xl font-display font-bold text-white mb-6">
+        ¿Quieres ser parte de redcudi?
+      </h2>
+      <p class="text-lg text-neutral-100 mb-8 max-w-2xl mx-auto">
+        Únete a nuestra comunidad o colabora como profesional de la salud para apoyar a la comunidad LGBTQ+.
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="/" class="btn-primary text-lg">
-          Volver al Inicio
-        </a>
-        <a href="/directory/" class="btn-secondary text-lg">
+        <a href="/directory/" class="btn-primary bg-white text-brand-teal-dark hover:bg-neutral-100">
           Ver Directorio
+        </a>
+        <a href="/contacto/" class="btn-secondary border-white text-white hover:bg-white hover:text-brand-teal-dark">
+          Ponte en Contacto
         </a>
       </div>
     </div>
