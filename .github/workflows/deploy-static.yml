@@ -21,6 +21,8 @@ jobs:
           key: ${{ secrets.PROD_SERVER_SSH_KEY }}
           script: |
             cd /proj/redcudi.org/.prod/astro
+            git reset --hard HEAD
+            git clean -fd
             git pull origin main
             npm ci
             npm run build
