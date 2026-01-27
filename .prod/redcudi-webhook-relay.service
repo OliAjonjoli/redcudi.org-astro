@@ -1,0 +1,31 @@
+[Unit]
+Description=Redcudi Webhook Relay Service
+# Start after network is available and Docker containers are up
+After=network.target docker.service
+Wants=docker.service
+
+[Service]
+Type=simple
+User=oliboli
+Group=oliboli
+WorkingDirectory=/proj/redcudi.org/.prod
+
+# Main service executable
+ExecStart=/usr/bin/node /proj/redcudi.org/.prod/webhook-relay.js
+
+# Restart policy
+Restart=always
+RestartSec=10
+
+# Process isolation
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=webhook-relay
+
+# Load environment variables from .env.webhook file
+# File location: /proj/redcudi.org/.prod/.env.webhook
+# Must contain: GH_PAT, RELAY_SECRET, PORT
+EnvironmentFile=/proj/redcudi.org/.prod/.env.webhook
+
+[Install]
+WantedBy=multi-user.target

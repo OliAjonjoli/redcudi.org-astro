@@ -1,0 +1,93 @@
+# Production Docker Compose Configuration
+#
+# Services:
+#   1. postgres (16-alpine) - PostgreSQL database
+#   2. strapi - Strapi CMS application
+#
+# Environment:
+#   - All sensitive values from .env file (not tracked in git)
+#   - Database credentials, API keys, JWT secrets
+#
+# Volumes:
+#   - postgres_data: Database persistence
+#   - strapi_uploads: User-uploaded files
+#
+# Networks:
+#   - redcudi-network: Internal communication between services
+#
+# To use:
+#   1. Create .env file with required variables (see .env.example)
+#   2. docker-compose up -d
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: redcudi-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-redcudi}
+      POSTGRES_USER: ${DB_USER:-redcudi}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - redcudi-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-redcudi}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Strapi CMS
+  strapi:
+    image: ghcr.io/oliajonjoli/redcudi.org-strapi:latest
+    container_name: redcudi-strapi
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Database Connection
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${DB_NAME:-redcudi}
+      DATABASE_USERNAME: ${DB_USER:-redcudi}
+      DATABASE_PASSWORD: ${DB_PASSWORD}
+      DATABASE_SSL: ${DATABASE_SSL:-false}
+      
+      # Strapi Configuration
+      NODE_ENV: ${NODE_ENV:-production}
+      APP_KEYS: ${APP_KEYS}
+      API_TOKEN_SALT: ${API_TOKEN_SALT}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+      
+      # API Configuration
+      STRAPI_URL: ${STRAPI_URL:-http://localhost:12002}
+    ports:
+      - "${STRAPI_PORT:-12002}:1337"
+    volumes:
+      - strapi_uploads:/app/public/uploads
+    networks:
+      - redcudi-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1337/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+  strapi_uploads:
+    driver: local
+
+networks:
+  redcudi-network:
+    driver: bridge

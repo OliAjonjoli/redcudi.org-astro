@@ -122,16 +122,29 @@ coverage
 ############################
 
 .env
-.env.*
+.env.webhook
+.env.local
+.env.*.local
 !.env.example
+!.env.webhook.example
+!.prod/.env.webhook.example
 dist
 build
+.astro/
 
 ############################
 # Deployment
 ############################
 
-.prod/
-.dev/
-docker-compose*.yml
-!docker-compose.example.yml
+# Allow .prod/ folder with configuration files
+# But ignore sensitive files within it
+.prod/**/.env
+.prod/**/.env.webhook
+.prod/**/node_modules
+.prod/**/dist
+
+# Docker
+# Allow docker-compose.yml files in .prod folder, but ignore secrets
+docker-compose.yml
+docker-compose.*.yml
+!.prod/docker-compose.yml
