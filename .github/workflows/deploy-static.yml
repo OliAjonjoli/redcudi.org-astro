@@ -1,0 +1,38 @@
+name: Deploy Static Files (Code Push)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Astro
+        run: npm run build
+
+      # Note: No auto-deploy for code changes
+      # You test locally first, then manually deploy when ready
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: astro-dist
+          path: dist/
+          retention-days: 5
