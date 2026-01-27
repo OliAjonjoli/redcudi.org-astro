@@ -1,4 +1,4 @@
-name: Deploy Static Files (Code Push)
+name: Deploy Astro (Code Push)
 
 on:
   push:
@@ -10,29 +10,18 @@ env:
   NODE_VERSION: "20"
 
 jobs:
-  build-and-deploy:
+  deploy-to-prod:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Deploy to production server
+        uses: appleboy/ssh-action@v1.0.0
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Astro
-        run: npm run build
-
-      # Note: No auto-deploy for code changes
-      # You test locally first, then manually deploy when ready
-      - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: astro-dist
-          path: dist/
-          retention-days: 5
+          host: ${{ secrets.PROD_SERVER_HOST }}
+          username: ${{ secrets.PROD_SERVER_USER }}
+          key: ${{ secrets.PROD_SERVER_SSH_KEY }}
+          script: |
+            cd /proj/redcudi.org/.prod/astro
+            git pull origin main
+            npm ci
+            npm run build
+            echo "✅ Astro deployed - nginx serves from /proj/redcudi.org/.prod/astro/dist"
