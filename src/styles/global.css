@@ -17,6 +17,11 @@
     font-family: Inter, system-ui, sans-serif;
   }
 
+  .dark body {
+    background-color: #111827;
+    color: #f3f4f6;
+  }
+
   h1, h2, h3, h4, h5, h6 {
     font-family: Poppins, system-ui, sans-serif;
     font-weight: 700;
@@ -116,6 +121,10 @@
     margin-bottom: 1rem;
   }
 
+  .dark .section-title {
+    color: #f3f4f6;
+  }
+
   @media (min-width: 768px) {
     .section-title {
       font-size: 2.25rem;
@@ -133,6 +142,10 @@
     color: #4b5563;
     margin-bottom: 2rem;
     max-width: 42rem;
+  }
+
+  .dark .section-subtitle {
+    color: #9ca3af;
   }
 
   .card {

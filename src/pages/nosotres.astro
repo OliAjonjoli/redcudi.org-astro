@@ -142,25 +142,25 @@ const coreValues = [
   </section>
 
   <!-- Mission & Vision Section -->
-  <section class="py-20 bg-white">
+  <section class="py-20 bg-white dark:bg-neutral-900">
     <div class="section-container">
       <div class="grid md:grid-cols-2 gap-12">
         <!-- Mission -->
-        <div class="bg-gradient-to-br from-brand-teal-light to-brand-teal-base p-8 rounded-lg">
-          <h2 class="text-3xl font-display font-bold text-brand-teal-dark mb-4">
+        <div class="bg-gradient-to-br from-brand-teal-light to-brand-teal-base dark:from-brand-teal-dark dark:to-brand-teal-base p-8 rounded-lg">
+          <h2 class="text-3xl font-display font-bold text-brand-teal-dark dark:text-white mb-4">
             Misión
           </h2>
-          <p class="text-neutral-700 text-lg leading-relaxed">
+          <p class="text-neutral-700 dark:text-neutral-100 text-lg leading-relaxed">
             Facilitar el acceso a servicios de salud y profesionales especializados que respeten la identidad de género y orientación sexual, en un ambiente inclusivo y libre de discriminación para la comunidad trans y LGBTQ+.
           </p>
         </div>
 
         <!-- Vision -->
-        <div class="bg-gradient-to-br from-brand-purple-light to-brand-purple-base p-8 rounded-lg">
-          <h2 class="text-3xl font-display font-bold text-brand-purple-dark mb-4">
+        <div class="bg-gradient-to-br from-brand-purple-light to-brand-purple-base dark:from-brand-purple-dark dark:to-brand-purple-base p-8 rounded-lg">
+          <h2 class="text-3xl font-display font-bold text-brand-purple-dark dark:text-white mb-4">
             Visión
           </h2>
-          <p class="text-neutral-700 text-lg leading-relaxed">
+          <p class="text-neutral-700 dark:text-neutral-100 text-lg leading-relaxed">
             Ser una plataforma de referencia que empodera a personas LGBTQ+ para acceder a atención médica de calidad, contribuyendo a una sociedad más inclusiva, equitativa y respetuosa con la diversidad.
           </p>
         </div>
@@ -169,25 +169,25 @@ const coreValues = [
   </section>
 
   <!-- Core Values Section -->
-  <section class="py-20 bg-neutral-50">
+  <section class="py-20 bg-neutral-50 dark:bg-neutral-800">
     <div class="section-container">
       <div class="text-center mb-16">
-        <h2 class="text-4xl font-display font-bold text-neutral-900 mb-4">
+        <h2 class="text-4xl font-display font-bold text-neutral-900 dark:text-white mb-4">
           Nuestros Valores
         </h2>
-        <p class="text-lg text-neutral-600 max-w-2xl mx-auto">
+        <p class="text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
           Los principios que guían nuestro trabajo y definen quiénes somos como organización.
         </p>
       </div>
 
       <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         {coreValues.map((value) => (
-          <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border-t-4 border-brand-teal-base">
+          <div class="bg-white dark:bg-neutral-700 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border-t-4 border-brand-teal-base dark:border-brand-teal-light">
             <div class="text-4xl mb-4">{value.icon}</div>
-            <h3 class="text-xl font-display font-bold text-neutral-900 mb-3">
+            <h3 class="text-xl font-display font-bold text-neutral-900 dark:text-white mb-3">
               {value.title}
             </h3>
-            <p class="text-neutral-600">
+            <p class="text-neutral-600 dark:text-neutral-300">
               {value.description}
             </p>
           </div>
@@ -197,13 +197,13 @@ const coreValues = [
   </section>
 
   <!-- Team Section -->
-  <section class="py-20 bg-white">
+  <section class="py-20 bg-white dark:bg-neutral-900">
     <div class="section-container">
       <div class="text-center mb-16">
-        <h2 class="text-4xl font-display font-bold text-neutral-900 mb-4">
+        <h2 class="text-4xl font-display font-bold text-neutral-900 dark:text-white mb-4">
           Nuestro Equipo
         </h2>
-        <p class="text-lg text-neutral-600 max-w-2xl mx-auto">
+        <p class="text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
           Personas comprometidas con la inclusión y el bienestar de la comunidad LGBTQ+.
         </p>
       </div>
@@ -218,7 +218,7 @@ const coreValues = [
             <div class={`grid md:grid-cols-2 gap-8 md:gap-12 items-center ${index % 2 === 1 ? 'md:auto-cols-max md:[direction:rtl]' : ''}`}>
               {/* Content */}
               <div class={index % 2 === 1 ? 'md:[direction:ltr]' : ''}>
-                <h3 class="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-1">
+                <h3 class="text-3xl md:text-4xl font-display font-bold text-neutral-900 dark:text-white mb-1">
                   {fullName || 'Nombre del Miembro'}
                 </h3>
                 {member.pronouns && (
@@ -226,10 +226,10 @@ const coreValues = [
                     {member.pronouns}
                   </p>
                 )}
-                <p class="text-lg font-semibold text-brand-teal-base mb-4">
+                <p class="text-lg font-semibold text-brand-teal-base dark:text-brand-teal-light mb-4">
                   {member.role || 'Posición/Rol'}
                 </p>
-                <p class="text-neutral-600 text-lg leading-relaxed mb-6">
+                <p class="text-neutral-600 dark:text-neutral-400 text-lg leading-relaxed mb-6">
                   {member.bio || 'Biografía no disponible'}
                 </p>
                 
@@ -247,7 +247,7 @@ const coreValues = [
                           target={target}
                           rel={platform === 'email' ? '' : 'noopener noreferrer'}
                           aria-label={config?.ariaLabel.replace('{name}', fullName) || platform}
-                          class="p-2 rounded-full bg-neutral-100 text-neutral-600 hover:bg-brand-teal-base hover:text-white transition-all inline-flex items-center justify-center"
+                          class="p-2 rounded-full bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-brand-teal-base dark:hover:bg-brand-teal-dark hover:text-white transition-all inline-flex items-center justify-center"
                           title={config?.label}
                         >
                           {config?.icon && <Icon name={config.icon} class="w-5 h-5" />}

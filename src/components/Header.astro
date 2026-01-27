@@ -1,4 +1,6 @@
 ---
+import ThemeToggle from './ThemeToggle.astro';
+
 interface Props {
   currentPage?: string;
 }
@@ -13,30 +15,31 @@ const navItems = [
 ];
 ---
 
-<header class="sticky top-0 z-50 w-full bg-white border-b border-neutral-200 shadow-sm">
+<header class="sticky top-0 z-50 w-full bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 shadow-sm">
   <nav class="section-container flex justify-between items-center py-4">
     <!-- Logo/Brand -->
     <div class="flex-shrink-0">
-      <a href="/" class="text-2xl font-display font-bold text-brand-teal-dark hover:text-brand-teal-base transition-colors">
+      <a href="/" class="text-2xl font-display font-bold text-brand-teal-dark dark:text-brand-teal-base hover:text-brand-teal-base transition-colors">
         redcudi
       </a>
-      <p class="text-xs text-brand-purple-dark font-semibold tracking-wide">Red de Cuidado Diverso</p>
+      <p class="text-xs text-brand-purple-dark dark:text-brand-purple-light font-semibold tracking-wide">Red de Cuidado Diverso</p>
     </div>
 
     <!-- Desktop Navigation -->
-    <div class="hidden md:flex items-center gap-8">
+    <div class="hidden md:flex items-center gap-6">
       {navItems.map((item) => (
         <a
           href={item.href}
           class={`font-medium transition-colors ${
             currentPage === item.href
-              ? 'text-brand-teal-dark'
-              : 'text-neutral-700 hover:text-brand-teal-dark'
+              ? 'text-brand-teal-dark dark:text-brand-teal-base'
+              : 'text-neutral-700 dark:text-neutral-300 hover:text-brand-teal-dark dark:hover:text-brand-teal-base'
           }`}
         >
           {item.label}
         </a>
       ))}
+      <ThemeToggle />
     </div>
 
     <!-- CTA Button (Desktop) -->
@@ -46,22 +49,25 @@ const navItems = [
       </a>
     </div>
 
-    <!-- Mobile Menu Button -->
-    <button
-      id="mobile-menu-btn"
-      class="md:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors"
-      aria-label="Toggle menu"
-    >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-    </button>
+    <!-- Mobile: Theme Toggle + Menu Button -->
+    <div class="md:hidden flex items-center gap-2">
+      <ThemeToggle />
+      <button
+        id="mobile-menu-btn"
+        class="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors text-neutral-700 dark:text-neutral-300"
+        aria-label="Toggle menu"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
   </nav>
 
   <!-- Mobile Navigation (Hidden by default) -->
   <div
     id="mobile-menu"
-    class="hidden md:hidden border-t border-neutral-200 bg-white"
+    class="hidden md:hidden border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900"
   >
     <div class="section-container text-center py-4 space-y-3">
       {navItems.map((item) => (
@@ -69,14 +75,14 @@ const navItems = [
           href={item.href}
           class={`block py-3 px-3 font-medium transition-all rounded-lg ${
             currentPage === item.href
-              ? 'text-neutral-900 bg-neutral-200'
-              : 'text-neutral-700 hover:text-brand-teal-dark hover:bg-neutral-100'
+              ? 'text-neutral-900 dark:text-neutral-100 bg-neutral-200 dark:bg-neutral-700'
+              : 'text-neutral-700 dark:text-neutral-300 hover:text-brand-teal-dark dark:hover:text-brand-teal-base hover:bg-neutral-100 dark:hover:bg-neutral-700'
           }`}
         >
           {item.label}
         </a>
       ))}
-      <div class="pt-4 border-t border-neutral-200">
+      <div class="pt-4 border-t border-neutral-200 dark:border-neutral-700">
         <a href="/directory/" class="btn-primary w-full text-center text-sm block">
           Buscar Profesionales
         </a>

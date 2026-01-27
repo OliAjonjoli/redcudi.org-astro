@@ -49,7 +49,7 @@ const features = [
       class="absolute inset-0 w-full h-full object-cover -z-10"
     />
     {/* Overlay for text readability */}
-    <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-black/40 -z-10"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-black/40 dark:from-black/80 dark:to-black/60 -z-10"></div>
     
     <div class="section-container relative z-10">
       <div class="max-w-3xl">
@@ -80,12 +80,12 @@ const features = [
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {features.map((feature) => (
-        <div class="card-hover">
+        <div class="card-hover dark:bg-neutral-800 dark:border-neutral-700">
           <div class="text-4xl mb-4">{feature.icon}</div>
-          <h3 class="font-display font-bold text-lg text-brand-teal-dark mb-2">
+          <h3 class="font-display font-bold text-lg text-brand-teal-dark dark:text-brand-teal-light mb-2">
             {feature.title}
           </h3>
-          <p class="text-neutral-600 text-sm">
+          <p class="text-neutral-600 dark:text-neutral-400 text-sm">
             {feature.description}
           </p>
         </div>
@@ -94,15 +94,15 @@ const features = [
   </section>
 
   <!-- CTA Section -->
-  <section class="bg-brand-purple-dark text-white py-16">
+  <section class="bg-brand-purple-dark dark:bg-neutral-800 text-white py-16">
     <div class="section-container text-center">
       <h2 class="text-3xl md:text-4xl font-display font-bold mb-4">
         ¿Listo para Encontrar Apoyo?
       </h2>
-      <p class="text-lg text-brand-purple-light mb-8 max-w-2xl mx-auto">
+      <p class="text-lg text-brand-purple-light dark:text-brand-purple-base mb-8 max-w-2xl mx-auto">
         Explora nuestro directorio de profesionales verificados que comprenden y apoyan a la comunidad LGBTQ+.
       </p>
-      <a href="/directory/" class="inline-block bg-white text-brand-purple-dark font-semibold px-8 py-4 rounded-lg hover:bg-neutral-100 transition-colors">
+      <a href="/directory/" class="inline-block bg-white text-brand-purple-dark dark:bg-neutral-700 dark:text-white font-semibold px-8 py-4 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-colors">
         Explorar Directorio
       </a>
     </div>

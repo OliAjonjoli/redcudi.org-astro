@@ -20,12 +20,74 @@ const { title, description = 'redcudi.org - Find trusted LGBTQ+ friendly profess
     <meta name="description" content={description} />
     <title>{title} | redcudi.org</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- Prevent FOUC (Flash of Unstyled Content) for dark mode -->
+    <script is:inline>
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+        return 'light';
+      })();
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
   </head>
-  <body class="bg-white text-neutral-900">
+  <body class="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
     <Header currentPage={currentPage} />
     <main>
       <slot />
     </main>
     <Footer />
+    
+    <!-- Theme toggle functionality - runs once for all toggle instances -->
+    <script is:inline>
+      (function() {
+        const themeToggleBtns = document.querySelectorAll('.theme-toggle-btn');
+        const darkIcons = document.querySelectorAll('.theme-toggle-dark-icon');
+        const lightIcons = document.querySelectorAll('.theme-toggle-light-icon');
+        const toggleCircles = document.querySelectorAll('.toggle-circle');
+
+        function setTheme(theme) {
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            lightIcons.forEach(icon => icon?.classList.remove('hidden'));
+            darkIcons.forEach(icon => icon?.classList.add('hidden'));
+            toggleCircles.forEach(circle => {
+              circle?.classList.add('translate-x-5');
+              circle?.classList.add('sm:translate-x-6');
+            });
+          } else {
+            document.documentElement.classList.remove('dark');
+            darkIcons.forEach(icon => icon?.classList.remove('hidden'));
+            lightIcons.forEach(icon => icon?.classList.add('hidden'));
+            toggleCircles.forEach(circle => {
+              circle?.classList.remove('translate-x-5');
+              circle?.classList.remove('sm:translate-x-6');
+            });
+          }
+          localStorage.setItem('theme', theme);
+        }
+
+        // Get initial theme
+        const currentTheme = localStorage.getItem('theme') || 
+          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        setTheme(currentTheme);
+
+        // Add click listeners to all toggle buttons
+        themeToggleBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            setTheme(isDark ? 'light' : 'dark');
+          });
+        });
+      })();
+    </script>
   </body>
 </html>
