@@ -10,7 +10,6 @@ const professionalsResponse = await getProfessionals().catch((error) => {
   return [];
 });
 
-// Normalize data
 const professionals = (professionalsResponse as any[] || [])
   .map((item: any) => {
     const attrs = item.attributes ?? item;
@@ -48,6 +47,15 @@ const professionals = (professionalsResponse as any[] || [])
     if (a.featured !== b.featured) return b.featured ? 1 : -1;
     return a.firstName.localeCompare(b.firstName);
   });
+
+// Extract unique states from professionals for dynamic dropdown
+const uniqueStates = Array.from(
+  new Set(
+    professionals
+      .filter((p: any) => p.location_state)
+      .map((p: any) => p.location_state.toLowerCase())
+  )
+).sort();
 ---
 
 <MainLayout 
@@ -98,9 +106,11 @@ const professionals = (professionalsResponse as any[] || [])
                 class="w-full px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-brand-teal-base"
               >
                 <option value="">Todos los estados</option>
-                <option value="puebla">Puebla</option>
-                <option value="mexico">Estado de México</option>
-                <option value="cdmx">CDMX</option>
+                {uniqueStates.map((state: string) => (
+                  <option key={state} value={state}>
+                    {state.charAt(0).toUpperCase() + state.slice(1)}
+                  </option>
+                ))}
               </select>
             </div>
 
