@@ -45,7 +45,7 @@ const { title, description = 'redcudi.org - Find trusted LGBTQ+ friendly profess
       <slot />
     </main>
     <Footer />
-    
+
     <!-- Theme toggle functionality - runs once for all toggle instances -->
     <script is:inline>
       (function() {
@@ -87,6 +87,28 @@ const { title, description = 'redcudi.org - Find trusted LGBTQ+ friendly profess
             setTheme(isDark ? 'light' : 'dark');
           });
         });
+      })();
+    </script>
+
+    <!-- Header scroll enhancement effect -->
+    <script is:inline>
+      (function() {
+        const header = document.querySelector('header[data-header]');
+        
+        function handleHeaderScroll() {
+          if (!header) return;
+          
+          if (window.scrollY > 10) {
+            header.classList.remove('shadow-sm', 'border-neutral-200/50', 'dark:border-neutral-700/50');
+            header.classList.add('shadow-md', 'border-neutral-200', 'dark:border-neutral-700');
+          } else {
+            header.classList.remove('shadow-md', 'border-neutral-200', 'dark:border-neutral-700');
+            header.classList.add('shadow-sm', 'border-neutral-200/50', 'dark:border-neutral-700/50');
+          }
+        }
+        
+        window.addEventListener('scroll', handleHeaderScroll, { passive: true });
+        handleHeaderScroll(); // Initial call
       })();
     </script>
   </body>

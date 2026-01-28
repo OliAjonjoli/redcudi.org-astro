@@ -47,25 +47,26 @@ async function fetchAPI<T>(
 }
 
 /**
- * Get all professionals with relations
- * Populates: specializations, professions
+ * Get all professionals with full relations for directory display
+ * Populates: photo, specializations, professions, social_media
  */
 export async function getProfessionals() {
   const response = await fetchAPI('/professionals', {
-    populate: 'specializations,professions',
+    populate: ['photo', 'specializations', 'professions', 'social_media'],
   });
   return response.data;
 }
 
 /**
- * Get a single professional by ID
- * @param id - Professional ID
+ * Get a single professional by slug with all details
+ * @param slug - Professional slug
  */
-export async function getProfessional(id: string | number) {
-  const response = await fetchAPI(`/professionals/${id}`, {
-    populate: 'specializations,professions',
+export async function getProfessionalBySlug(slug: string) {
+  const response = await fetchAPI('/professionals', {
+    populate: ['photo', 'specializations', 'professions', 'social_media'],
+    'filters[slug][$eq]': slug,
   });
-  return response.data;
+  return response.data?.[0] || null;
 }
 
 /**
@@ -148,11 +149,12 @@ export async function getStaffMembers() {
 /**
  * Get a single staff member by ID
  * @param id - Staff Member ID
+ * @param locale - Locale for i18n content (default: 'en')
  */
-export async function getStaffMember(id: string | number) {
+export async function getStaffMember(id: string | number, locale: string = 'en') {
   const response = await fetchAPI(`/staff-members/${id}`, {
     populate: ['photo', 'pronouns', 'social_media'],
-  });
+  }, locale);
   return response.data;
 }
 
@@ -160,10 +162,12 @@ export async function getStaffMember(id: string | number) {
  * Search professionals by various filters
  * @param filters - Filter criteria (e.g., { entity_type: 'individual_health' })
  * @param sort - Sort field (e.g., 'firstName')
+ * @param locale - Locale for i18n content (default: 'en')
  */
 export async function searchProfessionals(
   filters?: Record<string, unknown>,
-  sort?: string
+  sort?: string,
+  locale: string = 'en'
 ) {
   const params: Record<string, string> = {
     populate: 'specializations,professions',
@@ -181,6 +185,11 @@ export async function searchProfessionals(
     }
   }
 
-  const response = await fetchAPI('/professionals', params);
+  const response = await fetchAPI('/professionals', params, locale);
   return response.data;
 }
+
+/**
+ * Get all active social links for footer and other UI
+ * Sorted by order, filtered to show only active links
+ */

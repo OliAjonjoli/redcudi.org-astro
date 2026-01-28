@@ -2,6 +2,8 @@
 import MainLayout from '../layouts/MainLayout.astro';
 import { Icon } from 'astro-icon/components';
 import { getStaffMembers } from '../lib/strapi';
+import heroPeopleCelebration from '../assets/images/hero-people-celebration.jpg';
+import sideDiverseTeam from '../assets/images/side-diverse-team.jpg';
 
 // Fetch team members from Strapi at build time
 // If the API is unreachable or returns 403 (permissions), fall back to an empty list
@@ -12,8 +14,8 @@ const staffResponse = await getStaffMembers().catch((error) => {
 
 // Normalize data: sort by order, map to a render-friendly shape
 // Strapi v5 returns flattened attributes by default; fall back to attributes for older formats
-const teamMembers = (staffResponse || [])
-  .map((item) => {
+const teamMembers = (staffResponse as any[] || [])
+  .map((item: any) => {
     const attrs = (item as any).attributes ?? item; // support both shapes
     
     // Extract photo URL from Strapi media field
@@ -71,7 +73,7 @@ const teamMembers = (staffResponse || [])
       image: fullPhotoUrl || 'https://via.placeholder.com/300x300?text=Sin+Foto&fontSize=12&bgColor=E5D9F2&textColor=60579F',
     };
   })
-  .sort((a, b) => a.order - b.order);
+  .sort((a: any, b: any) => a.order - b.order);
 
 // Function to get pronoun color class
 function getPronounColorClass(pronouns: string): string {
@@ -91,12 +93,12 @@ const socialMediaConfig: Record<string, { label: string; ariaLabel: string; icon
   facebook: { label: 'Facebook', ariaLabel: 'Facebook de {name}', icon: 'lucide:facebook' },
   instagram: { label: 'Instagram', ariaLabel: 'Instagram de {name}', icon: 'lucide:instagram' },
   twitter: { label: 'Twitter', ariaLabel: 'Twitter de {name}', icon: 'lucide:twitter' },
-  tiktok: { label: 'TikTok', ariaLabel: 'TikTok de {name}', icon: 'lucide:music' },
+  tiktok: { label: 'TikTok', ariaLabel: 'TikTok de {name}', icon: 'proicons:tiktok' },
   linkedin: { label: 'LinkedIn', ariaLabel: 'LinkedIn de {name}', icon: 'lucide:linkedin' },
   website: { label: 'Website', ariaLabel: 'Website de {name}', icon: 'lucide:globe' },
   youtube: { label: 'YouTube', ariaLabel: 'YouTube de {name}', icon: 'lucide:youtube' },
-  bluesky: { label: 'Bluesky', ariaLabel: 'Bluesky de {name}', icon: 'lucide:cloud' },
-  threads: { label: 'Threads', ariaLabel: 'Threads de {name}', icon: 'lucide:message-circle' },
+  bluesky: { label: 'Bluesky', ariaLabel: 'Bluesky de {name}', icon: 'proicons:bluesky' },
+  threads: { label: 'Threads', ariaLabel: 'Threads de {name}', icon: 'mingcute:threads-line' },
   email: { label: 'Email', ariaLabel: 'Email de {name}', icon: 'lucide:mail' },
 };
 
@@ -129,43 +131,70 @@ const coreValues = [
   description="Conoce más sobre redcudi.org"
   currentPage="/about/"
 >
+
   <!-- Hero Section -->
-  <section class="min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-brand-teal-dark via-brand-purple-base to-brand-green-dark pt-20 pb-12">
+  <section class="min-h-[60vh] flex items-center justify-center bg-cover bg-center pt-20 pb-12" style={`background-image: linear-gradient(135deg, rgba(31, 97, 141, 0.7), rgba(96, 87, 159, 0.7), rgba(34, 139, 87, 0.7)), url('${heroPeopleCelebration.src}'); background-attachment: fixed;`}>
     <div class="section-container text-center">
       <h1 class="text-5xl md:text-6xl font-display font-bold text-white mb-6">
         Nosotres
       </h1>
-      <p class="text-xl text-neutral-100 max-w-2xl mx-auto">
-        Una organización sin fines de lucro dedicada a conectar la comunidad trans y LGBTQ+ con profesionales de salud confiables y servicios de calidad.
+      <div class="h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent w-24 mx-auto mb-6"></div>
+      <p class="text-2xl text-neutral-100 max-w-3xl mx-auto font-light">
+        Conectando a la comunidad LGBTQ+ con profesionales de confianza y servicios de calidad
       </p>
+    </div>
+  </section>
+
+  <!-- Spacer -->
+  <div class="h-12 md:h-16 bg-white dark:bg-neutral-900"></div>
+
+  <!-- Who We Are Section -->
+  <section class="py-20 bg-neutral-50 dark:bg-neutral-800">
+    <div class="section-container">
+      <h2 class="text-4xl font-display font-bold text-neutral-900 dark:text-white mb-8 text-center">
+        Quiénes Somos
+      </h2>
+      <div class="space-y-6">
+        <p class="text-lg text-neutral-700 dark:text-neutral-300 leading-relaxed">
+          REDCUDI es una organización sin fines de lucro dedicada a promover la equidad en salud para la población LGBTQ+ en México. Somos líderes en la conexión entre individuos de la comunidad trans y personas de identidades diversas con profesionales especializados y comprometidos que respetan plenamente su identidad y orientación sexual.
+        </p>
+        <p class="text-lg text-neutral-700 dark:text-neutral-300 leading-relaxed">
+          Nuestra visión es crear un ecosistema de atención integral donde cada persona de la comunidad LGBTQ+ tenga acceso equitativo a servicios de psicología, medicina y asesoramiento jurídico de alta calidad. Trabajamos con profesionales éticamente comprometidos que combinan expertise técnico con genuina sensibilidad hacia las realidades y necesidades específicas de nuestra comunidad.
+        </p>
+      </div>
     </div>
   </section>
 
   <!-- Mission & Vision Section -->
   <section class="py-20 bg-white dark:bg-neutral-900">
     <div class="section-container">
-      <div class="grid md:grid-cols-2 gap-12">
-        <!-- Mission -->
-        <div class="bg-gradient-to-br from-brand-teal-light to-brand-teal-base dark:from-brand-teal-dark dark:to-brand-teal-base p-8 rounded-lg">
-          <h2 class="text-3xl font-display font-bold text-brand-teal-dark dark:text-white mb-4">
-            Misión
-          </h2>
-          <p class="text-neutral-700 dark:text-neutral-100 text-lg leading-relaxed">
-            Facilitar el acceso a servicios de salud y profesionales especializados que respeten la identidad de género y orientación sexual, en un ambiente inclusivo y libre de discriminación para la comunidad trans y LGBTQ+.
-          </p>
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <!-- Left: Mission & Vision -->
+        <div class="space-y-12">
+          <!-- Mission -->
+          <div>
+            <h2 class="text-3xl font-display font-bold text-neutral-900 dark:text-white mb-4">
+              Misión
+            </h2>
+            <p class="text-lg text-neutral-700 dark:text-neutral-300 leading-relaxed">
+              Proporcionamos acceso a servicios especializados en psicología, medicina y derecho a través de una red de profesionales comprometidos. Nuestro modelo facilita costos accesibles mediante alianzas con patrocinadores, garantizando que cada persona pueda acceder a atención de calidad en un entorno confidencial, respetuoso y libre de discriminación.
+            </p>
+          </div>
+
+          <!-- Vision -->
+          <div>
+            <h2 class="text-3xl font-display font-bold text-neutral-900 dark:text-white mb-4">
+              Visión
+            </h2>
+            <p class="text-lg text-neutral-700 dark:text-neutral-300 leading-relaxed">
+              Aspiramos a consolidarnos como la plataforma de referencia para la población trans en México, conectando a individuos y comunidades con profesionales especializados y recursos confiables. Trabajamos hacia una sociedad donde la diversidad de género y orientación sexual sea completamente respetada, donde el acceso a servicios de calidad no dependa de limitaciones económicas, y donde cada persona pueda vivir con autenticidad, dignidad y sin prejuicios.
+            </p>
+          </div>
         </div>
 
-        <!-- Vision -->
-        <div class="bg-gradient-to-br from-brand-purple-light to-brand-purple-base dark:from-brand-purple-dark dark:to-brand-purple-base p-8 rounded-lg">
-          <h2 class="text-3xl font-display font-bold text-brand-purple-dark dark:text-white mb-4">
-            Visión
-          </h2>
-          <p class="text-neutral-700 dark:text-neutral-100 text-lg leading-relaxed">
-            Ser una plataforma de referencia que empodera a personas LGBTQ+ para acceder a atención médica de calidad, contribuyendo a una sociedad más inclusiva, equitativa y respetuosa con la diversidad.
-          </p>
-        </div>
-      </div>
-    </div>
+        <!-- Right: Image -->
+        <div class="flex items-center justify-center">
+          <img src={sideDiverseTeam.src} alt="Equipo diverso de profesionales" class="w-full rounded-lg shadow-lg object-cover aspect-square" />
   </section>
 
   <!-- Core Values Section -->
@@ -210,7 +239,7 @@ const coreValues = [
 
       <!-- Team Members Alternating Layout -->
       <div class="space-y-20">
-        {teamMembers.map((member, index) => {
+        {teamMembers.map((member: any, index: number) => {
           const fullName = `${member.firstName} ${member.lastName}`.trim();
           const pronounColorClass = getPronounColorClass(member.pronouns);
           
@@ -236,7 +265,7 @@ const coreValues = [
                 {/* Social Media Links */}
                 {member.socialMedia.length > 0 && (
                   <div class="flex gap-3">
-                    {member.socialMedia.map(({ platform, url }) => {
+                    {member.socialMedia.map(({ platform, url }: any) => {
                       const config = socialMediaConfig[platform];
                       const href = platform === 'email' ? `mailto:${url}` : url;
                       const target = platform === 'email' ? '_self' : '_blank';

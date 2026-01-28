@@ -1,5 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
+
 const currentYear = new Date().getFullYear();
 ---
 
@@ -13,14 +14,15 @@ const currentYear = new Date().getFullYear();
         <p class="text-neutral-400 dark:text-neutral-500 text-sm">
           Conectando la comunidad LGBTQ+ con servicios de salud y profesionales de confianza.
         </p>
+        <!-- Social Links -->
         <div class="flex gap-4 mt-4">
-          <a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors" aria-label="Facebook">
+          <a href="https://www.facebook.com/REDCUDIMX" class="text-neutral-400 hover:text-blue-500 transition-colors">
             <Icon name="lucide:facebook" class="w-5 h-5" />
           </a>
-          <a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors" aria-label="Twitter">
+          <a href="https://twitter.com/redcudi" class="text-neutral-400 hover:text-blue-400 transition-colors">
             <Icon name="lucide:twitter" class="w-5 h-5" />
           </a>
-          <a href="#" class="text-neutral-400 hover:text-brand-teal-light transition-colors" aria-label="Instagram">
+          <a href="https://www.instagram.com/redcudi/" class="text-neutral-400 hover:text-pink-500 transition-colors">
             <Icon name="lucide:instagram" class="w-5 h-5" />
           </a>
         </div>
@@ -59,9 +61,8 @@ const currentYear = new Date().getFullYear();
     </div>
 
     <!-- Bottom Footer -->
-    <div class="py-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-neutral-400">
+    <div class="py-8 flex flex-col md:flex-row justify-center items-center gap-4 text-sm text-neutral-400">
       <p>&copy; {currentYear} redcudi.org. Hecho con ❤️ para la comunidad LGBTQ+.</p>
-      <p>Una organización sin fines de lucro dedicada a conectar personas trans y LGBTQ+ con profesionales de confianza.</p>
     </div>
   </div>
 </footer>

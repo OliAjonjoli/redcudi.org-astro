@@ -1,0 +1,297 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { getProfessionalBySlug, getProfessionals } from '../../lib/strapi';
+import { Icon } from 'astro-icon/components';
+
+export async function getStaticPaths() {
+  const professionals = await getProfessionals().catch(() => []);
+  
+  return professionals
+    .filter((p: any) => {
+      const attrs = p.attributes ?? p;
+      return attrs?.slug;
+    })
+    .map((p: any) => ({
+      params: { slug: (p.attributes?.slug || p.slug) as string },
+    }));
+}
+
+const { slug } = Astro.params;
+
+// Fetch the professional
+const professionalData = await getProfessionalBySlug(slug!).catch(() => null);
+
+if (!professionalData) {
+  return Astro.redirect('/directorio/');
+}
+
+const attrs = professionalData.attributes ?? professionalData;
+const photoData = attrs?.photo?.data?.attributes || attrs?.photo;
+const photoUrl = photoData?.formats?.medium?.url || photoData?.url || null;
+const STRAPI_URL = import.meta.env.STRAPI_API_URL || 'http://localhost:1337';
+const fullPhotoUrl = photoUrl ? `${STRAPI_URL}${photoUrl}` : null;
+
+const professional = {
+  id: professionalData.id,
+  slug: attrs?.slug || '',
+  firstName: attrs?.firstName || '',
+  lastName: attrs?.lastName || '',
+  title: attrs?.title || '',
+  photo: fullPhotoUrl || 'https://via.placeholder.com/300x300?text=Sin+Foto',
+  verified: attrs?.verified || false,
+  featured: attrs?.featured || false,
+  bio: attrs?.bio || '',
+  lgbtq_friendly_statement: attrs?.lgbtq_friendly_statement || '',
+  location_city: attrs?.location_city || '',
+  location_state: attrs?.location_state || '',
+  contact_email: attrs?.contact_email || '',
+  contact_phone: attrs?.contact_phone || '',
+  contact_whatsapp: attrs?.contact_whatsapp || '',
+  website: attrs?.website || '',
+  pricing_model: attrs?.pricing_model || '',
+  specializations: attrs?.specializations?.data?.map((s: any) => ({
+    id: s.id,
+    name: (s.attributes?.name || s.name) as string,
+  })) || [],
+  professions: attrs?.professions?.data?.map((p: any) => ({
+    id: p.id,
+    name: (p.attributes?.name || p.name) as string,
+  })) || [],
+  social_media: attrs?.social_media || {},
+};
+
+// Social media configuration
+const socialMediaConfig: Record<string, { label: string; icon: string }> = {
+  facebook: { label: 'Facebook', icon: 'lucide:facebook' },
+  instagram: { label: 'Instagram', icon: 'lucide:instagram' },
+  twitter: { label: 'Twitter', icon: 'lucide:twitter' },
+  tiktok: { label: 'TikTok', icon: 'proicons:tiktok' },
+  linkedin: { label: 'LinkedIn', icon: 'lucide:linkedin' },
+  website: { label: 'Website', icon: 'lucide:globe' },
+  youtube: { label: 'YouTube', icon: 'lucide:youtube' },
+  bluesky: { label: 'Bluesky', icon: 'proicons:bluesky' },
+  threads: { label: 'Threads', icon: 'mingcute:threads-line' },
+};
+
+const pricingLabels: Record<string, string> = {
+  free: 'Gratuito',
+  low_cost: 'Bajo costo',
+  sliding_scale: 'Escala deslizante',
+  standard: 'Precio estándar',
+};
+---
+
+<MainLayout 
+  title={`${professional.firstName} ${professional.lastName}`}
+  description={`Conoce a ${professional.firstName} ${professional.lastName}, profesional verificado en ${professional.specializations.map(s => s.name).join(', ')}`}
+  currentPage="/directory/"
+>
+
+  <!-- Hero Section with Photo -->
+  <section class="py-20 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700">
+    <div class="section-container">
+      <div class="grid md:grid-cols-3 gap-12 items-start">
+        <!-- Photo -->
+        <div class="flex justify-center md:col-span-1">
+          <div class="relative w-full max-w-sm">
+            <img
+              src={professional.photo}
+              alt={`${professional.firstName} ${professional.lastName}`}
+              class="w-full rounded-lg shadow-lg"
+            />
+            {professional.verified && (
+              <div class="absolute top-4 right-4 bg-brand-teal-base text-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 shadow-lg">
+                <Icon name="lucide:check-circle" class="w-5 h-5" />
+                Verificado
+              </div>
+            )}
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="md:col-span-2 space-y-6">
+          <!-- Name & Title -->
+          <div>
+            <h1 class="text-4xl md:text-5xl font-display font-bold text-neutral-900 dark:text-white mb-2">
+              {professional.title && `${professional.title} `}
+              {professional.firstName} {professional.lastName}
+            </h1>
+          </div>
+
+          <!-- Specializations & Professions -->
+          <div class="space-y-3">
+            {professional.specializations.length > 0 && (
+              <div>
+                <h3 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Especializaciones:</h3>
+                <div class="flex flex-wrap gap-2">
+                  {professional.specializations.map((spec: any) => (
+                    <span key={spec.id} class="px-3 py-1 bg-brand-teal-light/20 dark:bg-brand-teal-dark/20 text-brand-teal-dark dark:text-brand-teal-light rounded-full text-sm font-medium">
+                      {spec.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {professional.professions.length > 0 && (
+              <div>
+                <h3 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Profesiones:</h3>
+                <div class="flex flex-wrap gap-2">
+                  {professional.professions.map((prof: any) => (
+                    <span key={prof.id} class="px-3 py-1 bg-brand-purple-light/20 dark:bg-brand-purple-dark/20 text-brand-purple-dark dark:text-brand-purple-light rounded-full text-sm font-medium">
+                      {prof.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <!-- Location -->
+          {(professional.location_city || professional.location_state) && (
+            <div class="flex items-center gap-3 text-neutral-700 dark:text-neutral-300">
+              <Icon name="lucide:map-pin" class="w-5 h-5 text-brand-teal-base" />
+              <span>
+                {professional.location_city && <span>{professional.location_city}</span>}
+                {professional.location_city && professional.location_state && <span>, </span>}
+                {professional.location_state && <span>{professional.location_state}</span>}
+              </span>
+            </div>
+          )}
+
+          <!-- Pricing Model -->
+          {professional.pricing_model && (
+            <div class="flex items-center gap-3 text-neutral-700 dark:text-neutral-300">
+              <Icon name="lucide:dollar-sign" class="w-5 h-5 text-brand-green-base" />
+              <span>{pricingLabels[professional.pricing_model] || professional.pricing_model}</span>
+            </div>
+          )}
+
+          <!-- Contact Actions -->
+          <div class="flex flex-wrap gap-3 pt-4">
+            {professional.contact_email && (
+              <a
+                href={`mailto:${professional.contact_email}`}
+                class="inline-flex items-center gap-2 px-4 py-2 bg-brand-teal-base hover:bg-brand-teal-dark text-white rounded-lg font-medium transition-colors"
+              >
+                <Icon name="lucide:mail" class="w-4 h-4" />
+                Enviar email
+              </a>
+            )}
+            {professional.contact_whatsapp && (
+              <a
+                href={`https://wa.me/${professional.contact_whatsapp.replace(/\D/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-base hover:bg-brand-green-dark text-white rounded-lg font-medium transition-colors"
+              >
+                <Icon name="lucide:message-circle" class="w-4 h-4" />
+                WhatsApp
+              </a>
+            )}
+            {professional.contact_phone && !professional.contact_whatsapp && (
+              <a
+                href={`tel:${professional.contact_phone}`}
+                class="inline-flex items-center gap-2 px-4 py-2 bg-brand-purple-base hover:bg-brand-purple-dark text-white rounded-lg font-medium transition-colors"
+              >
+                <Icon name="lucide:phone" class="w-4 h-4" />
+                Llamar
+              </a>
+            )}
+            {professional.website && (
+              <a
+                href={professional.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 px-4 py-2 border-2 border-brand-teal-base text-brand-teal-base hover:bg-brand-teal-light/10 dark:hover:bg-brand-teal-dark/10 rounded-lg font-medium transition-colors"
+              >
+                <Icon name="lucide:globe" class="w-4 h-4" />
+                Sitio web
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bio Section -->
+  {professional.bio && (
+    <section class="py-20 bg-neutral-50 dark:bg-neutral-800">
+      <div class="section-container">
+        <div class="max-w-3xl">
+          <h2 class="text-3xl font-display font-bold text-neutral-900 dark:text-white mb-6">
+            Sobre mí
+          </h2>
+          <div class="prose dark:prose-invert max-w-none">
+            <p class="text-lg text-neutral-700 dark:text-neutral-300 leading-relaxed">
+              {professional.bio}
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- LGBTQ+ Statement -->
+  {professional.lgbtq_friendly_statement && (
+    <section class="py-20 bg-white dark:bg-neutral-900">
+      <div class="section-container">
+        <div class="max-w-3xl mx-auto bg-gradient-to-r from-brand-teal-light/10 to-brand-purple-light/10 dark:from-brand-teal-dark/20 dark:to-brand-purple-dark/20 p-8 rounded-lg border-l-4 border-brand-teal-base">
+          <h2 class="text-2xl font-display font-bold text-neutral-900 dark:text-white mb-4 flex items-center gap-2">
+            <Icon name="lucide:heart" class="w-6 h-6 text-brand-teal-base" />
+            Nuestro compromiso LGBTQ+
+          </h2>
+          <p class="text-lg text-neutral-700 dark:text-neutral-300 leading-relaxed">
+            {professional.lgbtq_friendly_statement}
+          </p>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Social Media Links -->
+  {Object.keys(professional.social_media || {}).some(key => professional.social_media[key]) && (
+    <section class="py-16 bg-neutral-50 dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700">
+      <div class="section-container">
+        <h3 class="text-2xl font-display font-bold text-neutral-900 dark:text-white mb-6">
+          Conecta en redes sociales
+        </h3>
+        <div class="flex flex-wrap gap-4">
+          {Object.entries(professional.social_media || {}).map(([platform, url]) => {
+            if (!url || platform === 'id') return null;
+            const config = socialMediaConfig[platform];
+            if (!config) return null;
+            
+            return (
+              <a
+                key={platform}
+                href={String(url)}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-700 border-2 border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:border-brand-teal-base hover:text-brand-teal-base dark:hover:text-brand-teal-light rounded-lg font-medium transition-all"
+              >
+                <Icon name={config.icon} class="w-5 h-5" />
+                {config.label}
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Back to Directory -->
+  <section class="py-12 bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700">
+    <div class="section-container">
+      <a
+        href="/directorio/"
+        class="inline-flex items-center gap-2 text-brand-teal-base hover:text-brand-teal-dark dark:hover:text-brand-teal-light font-medium transition-colors"
+      >
+        <Icon name="lucide:arrow-left" class="w-4 h-4" />
+        Volver al directorio
+      </a>
+    </div>
+  </section>
+
+</MainLayout>

@@ -1,5 +1,53 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
+import heroLibraryArchive from '../assets/images/hero-library-archive.jpg';
+import { getProfessionals } from '../lib/strapi';
+import { Icon } from 'astro-icon/components';
+
+// Fetch professionals at build time
+const professionalsResponse = await getProfessionals().catch((error) => {
+  console.error('Error loading professionals from Strapi:', error);
+  return [];
+});
+
+// Normalize data
+const professionals = (professionalsResponse as any[] || [])
+  .map((item: any) => {
+    const attrs = item.attributes ?? item;
+    const photoData = attrs?.photo?.data?.attributes || attrs?.photo;
+    const photoUrl = photoData?.formats?.medium?.url || photoData?.url || null;
+    const STRAPI_URL = import.meta.env.STRAPI_API_URL || 'http://localhost:1337';
+    const fullPhotoUrl = photoUrl ? `${STRAPI_URL}${photoUrl}` : null;
+    
+    return {
+      id: item.id,
+      slug: attrs?.slug || '',
+      firstName: attrs?.firstName || '',
+      lastName: attrs?.lastName || '',
+      title: attrs?.title || '',
+      photo: fullPhotoUrl || 'https://via.placeholder.com/200x200?text=Sin+Foto',
+      verified: attrs?.verified || false,
+      featured: attrs?.featured || false,
+      location_city: attrs?.location_city || '',
+      location_state: attrs?.location_state || '',
+      contact_email: attrs?.contact_email || '',
+      contact_phone: attrs?.contact_phone || '',
+      specializations: attrs?.specializations?.data?.map((s: any) => ({
+        id: s.id,
+        name: (s.attributes?.name || s.name) as string,
+      })) || [],
+      professions: attrs?.professions?.data?.map((p: any) => ({
+        id: p.id,
+        name: (p.attributes?.name || p.name) as string,
+      })) || [],
+    };
+  })
+  .filter((p: any) => p.slug) // Only show published professionals with slug
+  .sort((a: any, b: any) => {
+    // Featured professionals first
+    if (a.featured !== b.featured) return b.featured ? 1 : -1;
+    return a.firstName.localeCompare(b.firstName);
+  });
 ---
 
 <MainLayout 
@@ -7,22 +55,248 @@ import MainLayout from '../layouts/MainLayout.astro';
   description="Directorio de profesionales LGBTQ+ verificados"
   currentPage="/directory/"
 >
-  <section class="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-teal-light via-brand-green-light to-brand-purple-light dark:from-brand-teal-dark dark:via-brand-green-dark dark:to-brand-purple-dark">
-    <div class="section-container text-center py-20">
-      <h1 class="text-5xl md:text-6xl font-display font-bold text-brand-teal-dark dark:text-white mb-6">
-        Próximamente
+
+  <section class="min-h-[60vh] flex items-center justify-center bg-cover bg-center pt-20 pb-12" style={`background-image: linear-gradient(135deg, rgba(31, 97, 141, 0.7), rgba(96, 87, 159, 0.7), rgba(34, 139, 87, 0.7)), url('${heroLibraryArchive.src}'); background-attachment: fixed;`}>
+    <div class="section-container text-center">
+      <h1 class="text-5xl md:text-6xl font-display font-bold text-white mb-6">
+        Directorio
       </h1>
-      <p class="text-xl text-neutral-700 dark:text-neutral-300 mb-8 max-w-2xl mx-auto">
-        Estamos trabajando en el directorio de profesionales. Pronto podrás explorar y conectar con profesionales verificados de la comunidad LGBTQ+.
+      <div class="h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent w-24 mx-auto mb-6"></div>
+      <p class="text-2xl text-neutral-100 max-w-3xl mx-auto font-light">
+        Explora y conecta con profesionales verificados de confianza
       </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="/" class="btn-primary text-lg">
-          Volver al Inicio
-        </a>
-        <a href="/about/" class="btn-secondary text-lg">
-          Conocer Más
-        </a>
+    </div>
+  </section>
+
+  <!-- Search & Filter Section -->
+  <section class="py-12 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700">
+    <div class="section-container">
+      <div class="max-w-4xl mx-auto">
+        <div class="space-y-6">
+          <!-- Search Input -->
+          <div>
+            <label for="search" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+              Buscar por nombre, especialidad o profesión
+            </label>
+            <input
+              type="text"
+              id="search"
+              placeholder="Ej: Psicólogo, Médico, Dermatología..."
+              class="w-full px-4 py-3 rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-brand-teal-base"
+            />
+          </div>
+
+          <!-- Filter Options -->
+          <div class="grid md:grid-cols-3 gap-4">
+            <!-- Location Filter -->
+            <div>
+              <label for="location" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                Ubicación
+              </label>
+              <select
+                id="location"
+                class="w-full px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-brand-teal-base"
+              >
+                <option value="">Todos los estados</option>
+                <option value="puebla">Puebla</option>
+                <option value="mexico">Estado de México</option>
+                <option value="cdmx">CDMX</option>
+              </select>
+            </div>
+
+            <!-- Verified Filter -->
+            <div>
+              <label for="verified" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                Estado de Verificación
+              </label>
+              <select
+                id="verified"
+                class="w-full px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-brand-teal-base"
+              >
+                <option value="">Todos</option>
+                <option value="verified">Verificados</option>
+                <option value="unverified">Por verificar</option>
+              </select>
+            </div>
+
+            <!-- Sort Filter -->
+            <div>
+              <label for="sort" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                Ordenar por
+              </label>
+              <select
+                id="sort"
+                class="w-full px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-brand-teal-base"
+              >
+                <option value="featured">Destacados primero</option>
+                <option value="name">Nombre (A-Z)</option>
+                <option value="verified">Verificados primero</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Results Count -->
+          <div class="text-sm text-neutral-600 dark:text-neutral-400">
+            Se encontraron <span id="results-count">{professionals.length}</span> profesionales
+          </div>
+        </div>
       </div>
     </div>
   </section>
+
+  <!-- Professionals Grid -->
+  <section class="py-20 bg-neutral-50 dark:bg-neutral-800">
+    <div class="section-container">
+      {professionals.length > 0 ? (
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="professionals-grid">
+          {professionals.map((professional: any) => (
+            <a
+              href={`/directorio/${professional.slug}`}
+              class="group bg-white dark:bg-neutral-700 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow border border-neutral-200 dark:border-neutral-600 hover:border-brand-teal-base dark:hover:border-brand-teal-light"
+              data-name={`${professional.firstName} ${professional.lastName}`}
+              data-location={`${professional.location_city} ${professional.location_state}`}
+              data-verified={professional.verified}
+            >
+              <!-- Photo -->
+              <div class="relative overflow-hidden bg-neutral-200 dark:bg-neutral-600 aspect-square">
+                <img
+                  src={professional.photo}
+                  alt={`${professional.firstName} ${professional.lastName}`}
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                {professional.verified && (
+                  <div class="absolute top-3 right-3 bg-brand-teal-base text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                    <Icon name="lucide:check-circle" class="w-4 h-4" />
+                    Verificado
+                  </div>
+                )}
+              </div>
+
+              <!-- Info -->
+              <div class="p-4 space-y-3">
+                <!-- Name -->
+                <div>
+                  <h3 class="text-lg font-display font-bold text-neutral-900 dark:text-white">
+                    {professional.title && `${professional.title} `}
+                    {professional.firstName} {professional.lastName}
+                  </h3>
+                </div>
+
+                <!-- Location -->
+                {(professional.location_city || professional.location_state) && (
+                  <div class="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                    <Icon name="lucide:map-pin" class="w-4 h-4" />
+                    {professional.location_city && <span>{professional.location_city}</span>}
+                    {professional.location_state && <span>{professional.location_state}</span>}
+                  </div>
+                )}
+
+                <!-- Specializations -->
+                {professional.specializations.length > 0 && (
+                  <div class="flex flex-wrap gap-2">
+                    {professional.specializations.slice(0, 3).map((spec: any) => (
+                      <span key={spec.id} class="inline-block px-2 py-1 bg-brand-teal-light/20 dark:bg-brand-teal-dark/20 text-brand-teal-dark dark:text-brand-teal-light text-xs rounded-full font-medium">
+                        {spec.name}
+                      </span>
+                    ))}
+                    {professional.specializations.length > 3 && (
+                      <span class="inline-block px-2 py-1 bg-neutral-200 dark:bg-neutral-600 text-neutral-700 dark:text-neutral-300 text-xs rounded-full font-medium">
+                        +{professional.specializations.length - 3}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                <!-- Contact Preview -->
+                <div class="flex gap-2 pt-2 border-t border-neutral-200 dark:border-neutral-600">
+                  {professional.contact_email && (
+                    <Icon name="lucide:mail" class="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
+                  )}
+                  {professional.contact_phone && (
+                    <Icon name="lucide:phone" class="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
+                  )}
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-20">
+          <Icon name="lucide:inbox" class="w-16 h-16 mx-auto text-neutral-400 dark:text-neutral-600 mb-4" />
+          <h3 class="text-xl font-display font-bold text-neutral-900 dark:text-white mb-2">
+            No hay profesionales disponibles
+          </h3>
+          <p class="text-neutral-600 dark:text-neutral-400">
+            Estamos construyendo nuestro directorio de profesionales verificados. Vuelve pronto.
+          </p>
+        </div>
+      )}
+    </div>
+  </section>
+
 </MainLayout>
+
+<script>
+  // Client-side search and filtering
+  const searchInput = document.getElementById('search') as HTMLInputElement;
+  const locationSelect = document.getElementById('location') as HTMLSelectElement;
+  const verifiedSelect = document.getElementById('verified') as HTMLSelectElement;
+  const sortSelect = document.getElementById('sort') as HTMLSelectElement;
+  const grid = document.getElementById('professionals-grid');
+  const resultsCount = document.getElementById('results-count');
+
+  if (grid && searchInput && locationSelect && verifiedSelect && sortSelect) {
+    const cards = Array.from(grid.children) as HTMLElement[];
+    
+    function filterAndSort() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const location = locationSelect.value.toLowerCase();
+      const verified = verifiedSelect.value;
+      const sort = sortSelect.value;
+
+      let filtered = cards.filter((card) => {
+        const text = card.textContent?.toLowerCase() || '';
+        const matchesSearch = !searchTerm || text.includes(searchTerm);
+        
+        const locationMatch = card.getAttribute('data-location')?.toLowerCase() || '';
+        const matchesLocation = !location || locationMatch.includes(location);
+        
+        const isVerified = card.getAttribute('data-verified') === 'true';
+        const matchesVerified = !verified || (verified === 'verified' ? isVerified : !isVerified);
+        
+        return matchesSearch && matchesLocation && matchesVerified;
+      });
+
+      // Apply sorting
+      if (sort === 'name') {
+        filtered.sort((a, b) => {
+          const aName = a.getAttribute('data-name') || '';
+          const bName = b.getAttribute('data-name') || '';
+          return aName.localeCompare(bName);
+        });
+      } else if (sort === 'verified') {
+        filtered.sort((a, b) => {
+          const aVerified = a.getAttribute('data-verified') === 'true' ? 1 : 0;
+          const bVerified = b.getAttribute('data-verified') === 'true' ? 1 : 0;
+          return bVerified - aVerified;
+        });
+      }
+
+      // Update visibility
+      cards.forEach((card) => {
+        card.style.display = filtered.includes(card) ? '' : 'none';
+      });
+
+      // Update count
+      if (resultsCount) {
+        resultsCount.textContent = filtered.length;
+      }
+    }
+
+    searchInput.addEventListener('input', filterAndSort);
+    locationSelect.addEventListener('change', filterAndSort);
+    verifiedSelect.addEventListener('change', filterAndSort);
+    sortSelect.addEventListener('change', filterAndSort);
+  }
+</script>
+
