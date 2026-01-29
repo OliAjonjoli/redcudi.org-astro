@@ -64,7 +64,7 @@ const uniqueStates = Array.from(
   currentPage="/directory/"
 >
 
-  <section class="min-h-[60vh] flex items-center justify-center bg-cover bg-center pt-20 pb-12" style={`background-image: linear-gradient(135deg, rgba(31, 97, 141, 0.7), rgba(96, 87, 159, 0.7), rgba(34, 139, 87, 0.7)), url('${heroLibraryArchive.src}'); background-attachment: fixed;`}>
+  <section class="min-h-[60vh] flex items-center justify-center bg-cover bg-center pt-20 pb-12" style={`background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('${heroLibraryArchive.src}'); background-attachment: fixed;`}>
     <div class="section-container text-center">
       <h1 class="text-5xl md:text-6xl font-display font-bold text-white mb-6">
         Directorio
@@ -175,7 +175,7 @@ const uniqueStates = Array.from(
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 {professional.verified && (
-                  <div class="absolute top-3 right-3 bg-brand-teal-base text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                  <div class="absolute top-3 right-3 bg-brand-teal-dark text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
                     <Icon name="lucide:check-circle" class="w-4 h-4" />
                     Verificado
                   </div>

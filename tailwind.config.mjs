@@ -15,7 +15,7 @@ export default {
           },
           // Green family (secondary)
           green: {
-            dark: '#a2d164',
+            dark: '#a1d164',
             base: '#c8f88a',
             light: '#dffcb8',
           },

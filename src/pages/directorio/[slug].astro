@@ -31,12 +31,39 @@ const photoUrl = photoData?.formats?.medium?.url || photoData?.url || null;
 const STRAPI_URL = import.meta.env.STRAPI_API_URL || 'http://localhost:1337';
 const fullPhotoUrl = photoUrl ? `${STRAPI_URL}${photoUrl}` : null;
 
+// Extract pronouns - handle both v4 and v5 formats
+let pronounsArray = attrs?.pronouns || [];
+if (pronounsArray?.data) {
+  pronounsArray = pronounsArray.data; // v4 format
+}
+
+// Get the value from pronouns - handle both array and single object
+const pronounsValue = Array.isArray(pronounsArray) 
+  ? pronounsArray?.[0]?.value || ''
+  : pronounsArray?.value || '';
+
+console.log('Pronouns extraction debug:', { raw: attrs?.pronouns, array: pronounsArray, value: pronounsValue });
+
+// Function to get pronoun color class
+function getPronounColorClass(pronouns: string): string {
+  if (pronouns.includes('ella') || pronouns.includes('femenino')) {
+    return 'pronoun-ella';
+  } else if (pronouns.includes('él') || pronouns.includes('masculino')) {
+    return 'pronoun-el';
+  } else {
+    // For neutral pronouns, randomize between colors
+    const neutralColors = ['pronoun-neutral-orange', 'pronoun-neutral-green', 'pronoun-neutral-yellow', 'pronoun-neutral-purple'];
+    return neutralColors[Math.floor(Math.random() * neutralColors.length)];
+  }
+}
+
 const professional = {
   id: professionalData.id,
   slug: attrs?.slug || '',
   firstName: attrs?.firstName || '',
   lastName: attrs?.lastName || '',
   title: attrs?.title || '',
+  pronouns: pronounsValue,
   photo: fullPhotoUrl || 'https://via.placeholder.com/300x300?text=Sin+Foto',
   verified: attrs?.verified || false,
   featured: attrs?.featured || false,
@@ -61,16 +88,16 @@ const professional = {
 };
 
 // Social media configuration
-const socialMediaConfig: Record<string, { label: string; icon: string }> = {
-  facebook: { label: 'Facebook', icon: 'lucide:facebook' },
-  instagram: { label: 'Instagram', icon: 'lucide:instagram' },
-  twitter: { label: 'Twitter', icon: 'lucide:twitter' },
-  tiktok: { label: 'TikTok', icon: 'proicons:tiktok' },
-  linkedin: { label: 'LinkedIn', icon: 'lucide:linkedin' },
-  website: { label: 'Website', icon: 'lucide:globe' },
-  youtube: { label: 'YouTube', icon: 'lucide:youtube' },
-  bluesky: { label: 'Bluesky', icon: 'proicons:bluesky' },
-  threads: { label: 'Threads', icon: 'mingcute:threads-line' },
+const socialMediaConfig: Record<string, { label: string; icon: string; color: string }> = {
+  facebook: { label: 'Facebook', icon: 'lucide:facebook', color: '#1877F2' },
+  instagram: { label: 'Instagram', icon: 'lucide:instagram', color: '#E4405F' },
+  twitter: { label: 'Twitter', icon: 'lucide:twitter', color: '#1DA1F2' },
+  tiktok: { label: 'TikTok', icon: 'proicons:tiktok', color: '#000000' },
+  linkedin: { label: 'LinkedIn', icon: 'lucide:linkedin', color: '#0A66C2' },
+  website: { label: 'Website', icon: 'lucide:globe', color: '#4F46E5' },
+  youtube: { label: 'YouTube', icon: 'lucide:youtube', color: '#FF0000' },
+  bluesky: { label: 'Bluesky', icon: 'proicons:bluesky', color: '#1185FE' },
+  threads: { label: 'Threads', icon: 'mingcute:threads-line', color: '#000000' },
 };
 
 const pricingLabels: Record<string, string> = {
@@ -87,45 +114,76 @@ const pricingLabels: Record<string, string> = {
   currentPage="/directory/"
 >
 
-  <!-- Hero Section with Photo -->
-  <section class="py-20 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700">
-    <div class="section-container">
-      <div class="grid md:grid-cols-3 gap-12 items-start">
-        <!-- Photo -->
-        <div class="flex justify-center md:col-span-1">
-          <div class="relative w-full max-w-sm">
-            <img
-              src={professional.photo}
-              alt={`${professional.firstName} ${professional.lastName}`}
-              class="w-full rounded-lg shadow-lg"
-            />
-            {professional.verified && (
-              <div class="absolute top-4 right-4 bg-brand-teal-base text-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 shadow-lg">
-                <Icon name="lucide:check-circle" class="w-5 h-5" />
-                Verificado
-              </div>
-            )}
-          </div>
-        </div>
+  <!-- Responsive Profile: Mobile Link.Tree, Desktop Doximity-style -->
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-900 dark:to-neutral-800">
+    
+    <!-- Back Button -->
+    <div class="sticky top-0 z-10 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm border-b border-neutral-200 dark:border-neutral-700 p-4 lg:hidden">
+      <a
+        href="/directorio/"
+        class="inline-flex items-center gap-2 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-brand-teal-base dark:hover:text-brand-teal-light transition-colors"
+      >
+        <Icon name="lucide:arrow-left" class="w-4 h-4" />
+        Volver al directorio
+      </a>
+    </div>
 
-        <!-- Info -->
-        <div class="md:col-span-2 space-y-6">
+    <!-- Mobile Layout (Link.Tree Style) -->
+    <div class="lg:hidden pt-8 pb-20 px-4">
+      <div class="max-w-md mx-auto">
+        <!-- Profile Card -->
+        <div class="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg p-8 text-center space-y-6">
+          
+          <!-- Profile Image -->
+          <div class="flex justify-center">
+            <div class="relative">
+              <img
+                src={professional.photo}
+                alt={`${professional.firstName} ${professional.lastName}`}
+                class="w-32 h-32 rounded-full object-cover border-4 border-brand-teal-base/20 shadow-md"
+              />
+              {professional.verified && (
+                <div class="absolute -bottom-2 right-0 bg-brand-teal-base text-white p-2 rounded-full shadow-md" title="Verificado">
+                  <Icon name="lucide:check-circle" class="w-6 h-6" />
+                </div>
+              )}
+            </div>
+          </div>
+
           <!-- Name & Title -->
           <div>
-            <h1 class="text-4xl md:text-5xl font-display font-bold text-neutral-900 dark:text-white mb-2">
-              {professional.title && `${professional.title} `}
+            <h1 class="text-3xl font-display font-bold text-neutral-900 dark:text-white">
               {professional.firstName} {professional.lastName}
             </h1>
+            {professional.pronouns && (
+              <p class={`text-xs font-semibold px-3 py-1 rounded-full inline-block mb-2 mt-2 ${getPronounColorClass(professional.pronouns)}`}>
+                {professional.pronouns}
+              </p>
+            )}
+            {professional.title && (
+              <p class="text-brand-teal-base font-semibold mt-1">
+                {professional.title}
+              </p>
+            )}
           </div>
 
+          <!-- Location Badge -->
+          {(professional.location_city || professional.location_state) && (
+            <div class="flex items-center justify-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+              <Icon name="lucide:map-pin" class="w-4 h-4 text-brand-teal-base" />
+              <span>
+                {professional.location_city}{professional.location_city && professional.location_state ? ', ' : ''}{professional.location_state}
+              </span>
+            </div>
+          )}
+
           <!-- Specializations & Professions -->
-          <div class="space-y-3">
+          <div class="space-y-3 pt-2">
             {professional.specializations.length > 0 && (
               <div>
-                <h3 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Especializaciones:</h3>
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-2 justify-center">
                   {professional.specializations.map((spec: any) => (
-                    <span key={spec.id} class="px-3 py-1 bg-brand-teal-light/20 dark:bg-brand-teal-dark/20 text-brand-teal-dark dark:text-brand-teal-light rounded-full text-sm font-medium">
+                    <span key={spec.id} class="inline-block px-3 py-1 text-xs font-medium bg-brand-teal-light/20 dark:bg-brand-teal-dark/30 text-brand-teal-dark dark:text-brand-teal-light rounded-full">
                       {spec.name}
                     </span>
                   ))}
@@ -135,10 +193,9 @@ const pricingLabels: Record<string, string> = {
             
             {professional.professions.length > 0 && (
               <div>
-                <h3 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Profesiones:</h3>
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-2 justify-center">
                   {professional.professions.map((prof: any) => (
-                    <span key={prof.id} class="px-3 py-1 bg-brand-purple-light/20 dark:bg-brand-purple-dark/20 text-brand-purple-dark dark:text-brand-purple-light rounded-full text-sm font-medium">
+                    <span key={prof.id} class="inline-block px-3 py-1 text-xs font-medium bg-brand-purple-light/20 dark:bg-brand-purple-dark/30 text-brand-purple-dark dark:text-brand-purple-light rounded-full">
                       {prof.name}
                     </span>
                   ))}
@@ -147,151 +204,355 @@ const pricingLabels: Record<string, string> = {
             )}
           </div>
 
-          <!-- Location -->
-          {(professional.location_city || professional.location_state) && (
-            <div class="flex items-center gap-3 text-neutral-700 dark:text-neutral-300">
-              <Icon name="lucide:map-pin" class="w-5 h-5 text-brand-teal-base" />
-              <span>
-                {professional.location_city && <span>{professional.location_city}</span>}
-                {professional.location_city && professional.location_state && <span>, </span>}
-                {professional.location_state && <span>{professional.location_state}</span>}
-              </span>
-            </div>
-          )}
-
-          <!-- Pricing Model -->
+          <!-- Pricing Model Badge -->
           {professional.pricing_model && (
-            <div class="flex items-center gap-3 text-neutral-700 dark:text-neutral-300">
-              <Icon name="lucide:dollar-sign" class="w-5 h-5 text-brand-green-base" />
+            <div class="flex items-center justify-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg py-2 px-4">
+              <Icon name="lucide:dollar-sign" class="w-4 h-4 text-brand-green-base" />
               <span>{pricingLabels[professional.pricing_model] || professional.pricing_model}</span>
             </div>
           )}
 
-          <!-- Contact Actions -->
-          <div class="flex flex-wrap gap-3 pt-4">
-            {professional.contact_email && (
-              <a
-                href={`mailto:${professional.contact_email}`}
-                class="inline-flex items-center gap-2 px-4 py-2 bg-brand-teal-base hover:bg-brand-teal-dark text-white rounded-lg font-medium transition-colors"
-              >
-                <Icon name="lucide:mail" class="w-4 h-4" />
-                Enviar email
-              </a>
-            )}
-            {professional.contact_whatsapp && (
-              <a
-                href={`https://wa.me/${professional.contact_whatsapp.replace(/\D/g, '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-base hover:bg-brand-green-dark text-white rounded-lg font-medium transition-colors"
-              >
-                <Icon name="lucide:message-circle" class="w-4 h-4" />
-                WhatsApp
-              </a>
-            )}
-            {professional.contact_phone && !professional.contact_whatsapp && (
-              <a
-                href={`tel:${professional.contact_phone}`}
-                class="inline-flex items-center gap-2 px-4 py-2 bg-brand-purple-base hover:bg-brand-purple-dark text-white rounded-lg font-medium transition-colors"
-              >
-                <Icon name="lucide:phone" class="w-4 h-4" />
-                Llamar
-              </a>
-            )}
-            {professional.website && (
-              <a
-                href={professional.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-2 px-4 py-2 border-2 border-brand-teal-base text-brand-teal-base hover:bg-brand-teal-light/10 dark:hover:bg-brand-teal-dark/10 rounded-lg font-medium transition-colors"
-              >
-                <Icon name="lucide:globe" class="w-4 h-4" />
-                Sitio web
-              </a>
-            )}
+        </div>
+
+        <!-- Contact CTA Buttons - Full Width -->
+        <div class="space-y-3 mt-8">
+          {professional.contact_whatsapp && (
+            <a
+              href={`https://wa.me/${professional.contact_whatsapp.replace(/\D/g, '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-full flex items-center justify-center gap-3 px-6 py-4 bg-brand-green-base hover:bg-brand-green-dark text-white rounded-xl font-semibold transition-all transform hover:scale-105 shadow-md"
+            >
+              <Icon name="mingcute:whatsapp-line" class="w-5 h-5" />
+              Mensaje por WhatsApp
+            </a>
+          )}
+
+          {professional.contact_email && (
+            <a
+              href={`mailto:${professional.contact_email}`}
+              class="w-full flex items-center justify-center gap-3 px-6 py-4 bg-brand-teal-base hover:bg-brand-teal-dark text-white rounded-xl font-semibold transition-all transform hover:scale-105 shadow-md"
+            >
+              <Icon name="lucide:mail" class="w-5 h-5" />
+              Enviar email
+            </a>
+          )}
+
+          {professional.contact_phone && !professional.contact_whatsapp && (
+            <a
+              href={`tel:${professional.contact_phone}`}
+              class="w-full flex items-center justify-center gap-3 px-6 py-4 bg-brand-purple-base hover:bg-brand-purple-dark text-white rounded-xl font-semibold transition-all transform hover:scale-105 shadow-md"
+            >
+              <Icon name="lucide:phone" class="w-5 h-5" />
+              Llamar
+            </a>
+          )}
+
+          {professional.website && (
+            <a
+              href={professional.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-full flex items-center justify-center gap-3 px-6 py-4 bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-neutral-900 dark:text-white rounded-xl font-semibold transition-all transform hover:scale-105"
+            >
+              <Icon name="lucide:globe" class="w-5 h-5" />
+              Visitar sitio web
+            </a>
+          )}
+        </div>
+
+        <!-- Social Media Links - Icons Only -->
+        {Object.keys(professional.social_media || {}).some(key => professional.social_media[key]) && (
+          <div class="mt-8 pt-8 border-t border-neutral-200 dark:border-neutral-700">
+            <div class="flex justify-center gap-3">
+              {Object.entries(professional.social_media || {}).map(([platform, url]) => {
+                if (!url || platform === 'id') return null;
+                const config = socialMediaConfig[platform];
+                if (!config) return null;
+                
+                return (
+                  <a
+                    key={platform}
+                    href={String(url)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="group inline-flex items-center justify-center w-10 h-10 bg-neutral-100 dark:bg-neutral-700 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                    title={config.label}
+                    style={`--brand-color: ${config.color}`}
+                  >
+                    <Icon 
+                      name={config.icon} 
+                      class="w-5 h-5 text-neutral-700 dark:text-neutral-300 transition-all duration-300 group-hover:text-white"
+                    />
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <!-- Bio Section -->
+        {professional.bio && (
+          <div class="mt-8 pt-8 border-t border-neutral-200 dark:border-neutral-700">
+            <h2 class="text-sm font-semibold text-neutral-600 dark:text-neutral-400 mb-3">Acerca de mí</h2>
+            <p class="text-neutral-700 dark:text-neutral-300 text-sm leading-relaxed">
+              {professional.bio}
+            </p>
+          </div>
+        )}
+
+        <!-- LGBTQ+ Statement -->
+        {professional.lgbtq_friendly_statement && (
+          <div class="mt-8 pt-8 border-t border-neutral-200 dark:border-neutral-700">
+            <div class="bg-gradient-to-r from-brand-teal-light/10 to-brand-purple-light/10 dark:from-brand-teal-dark/20 dark:to-brand-purple-dark/20 p-4 rounded-lg border border-brand-teal-light/30 dark:border-brand-teal-dark/30">
+              <p class="flex items-start gap-3 text-sm text-neutral-700 dark:text-neutral-300">
+                <Icon name="lucide:heart" class="w-5 h-5 text-brand-teal-base flex-shrink-0 mt-0.5" />
+                <span>{professional.lgbtq_friendly_statement}</span>
+              </p>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+
+    <!-- Desktop Layout (Doximity-style) -->
+    <div class="hidden lg:block">
+      <!-- Top Navigation -->
+      <div class="bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700">
+        <div class="max-w-7xl mx-auto px-8 py-4">
+          <a
+            href="/directorio/"
+            class="inline-flex items-center gap-2 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-brand-teal-base dark:hover:text-brand-teal-light transition-colors"
+          >
+            <Icon name="lucide:arrow-left" class="w-4 h-4" />
+            Volver al directorio
+          </a>
+        </div>
+      </div>
+
+      <!-- Hero Section with Photo Left, Info Right -->
+      <div class="bg-brand-teal-dark dark:bg-brand-teal-dark border-b border-neutral-200 dark:border-neutral-700">
+        <div class="max-w-7xl mx-auto px-8 py-12">
+          <div class="grid grid-cols-3 gap-12">
+            <!-- Photo -->
+            <div class="col-span-1">
+              <div class="relative">
+                <img
+                  src={professional.photo}
+                  alt={`${professional.firstName} ${professional.lastName}`}
+                  class="w-full rounded-xl shadow-lg object-cover aspect-square"
+                />
+                {professional.verified && (
+                  <div class="absolute -bottom-3 right-0 bg-brand-orange-base dark:bg-brand-orange-dark text-white p-3 rounded-full shadow-lg group cursor-help">
+                    <Icon name="lucide:check-circle" class="w-8 h-8" />
+                    <div class="absolute -top-14 right-0 hidden group-hover:block bg-neutral-900 dark:bg-neutral-950 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap shadow-lg z-10">
+                       Este perfil ha sido autenticado en nuestra plataforma
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <!-- Info -->
+            <div class="col-span-2 bg-white dark:bg-neutral-800 rounded-xl p-8 shadow-lg space-y-6">
+              <!-- Name & Title -->
+              <div>
+                <h1 class="text-5xl font-display font-bold leading-tight">
+                  {professional.title && (
+                    <span class="text-brand-purple-dark dark:text-brand-purple-light">{professional.title}</span>
+                  )}
+                  {professional.title && ' '}
+                  <span class="text-neutral-900 dark:text-white">{professional.firstName} {professional.lastName}</span>
+                </h1>
+                {professional.pronouns && (
+                  <p class={`text-sm font-semibold px-3 py-1 rounded-full inline-block mb-3 ${getPronounColorClass(professional.pronouns)}`}>
+                    {professional.pronouns}
+                  </p>
+                )}
+              </div>
+
+              <!-- Location -->
+              {(professional.location_city || professional.location_state) && (
+                <div class="flex items-center gap-3 text-neutral-700 dark:text-neutral-300">
+                  <Icon name="lucide:map-pin" class="w-5 h-5 text-brand-teal-base flex-shrink-0" />
+                  <span class="text-lg">
+                    {professional.location_city}{professional.location_city && professional.location_state ? ', ' : ''}{professional.location_state}
+                  </span>
+                </div>
+              )}
+
+              <!-- Specializations & Professions -->
+              <div class="space-y-3">
+                {professional.specializations.length > 0 && (
+                  <div>
+                    <h3 class="text-sm font-semibold text-neutral-600 dark:text-neutral-400 mb-2">Especializaciones</h3>
+                    <div class="flex flex-wrap gap-2">
+                      {professional.specializations.map((spec: any) => (
+                        <span key={spec.id} class="px-3 py-1 bg-brand-teal-light/20 dark:bg-brand-teal-dark/30 text-brand-teal-dark dark:text-brand-teal-light rounded-full text-sm font-medium">
+                          {spec.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {professional.professions.length > 0 && (
+                  <div>
+                    <h3 class="text-sm font-semibold text-neutral-600 dark:text-neutral-400 mb-2">Profesiones</h3>
+                    <div class="flex flex-wrap gap-2">
+                      {professional.professions.map((prof: any) => (
+                        <span key={prof.id} class="px-3 py-1 bg-brand-purple-light/20 dark:bg-brand-purple-dark/30 text-brand-purple-dark dark:text-brand-purple-light rounded-full text-sm font-medium">
+                          {prof.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <!-- Pricing Model -->
+              {professional.pricing_model && (
+                <div class="flex items-center gap-3 text-neutral-700 dark:text-neutral-300">
+                  <Icon name="lucide:dollar-sign" class="w-5 h-5 text-brand-green-base flex-shrink-0" />
+                  <span>{pricingLabels[professional.pricing_model] || professional.pricing_model}</span>
+                </div>
+              )}
+
+              <!-- Contact Buttons -->
+              <div class="flex flex-wrap gap-3 pt-6">
+                {professional.contact_whatsapp && (
+                  <a
+                    href={`https://wa.me/${professional.contact_whatsapp.replace(/\D/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-green-base hover:bg-brand-green-dark text-white rounded-full font-semibold transition-all transform hover:scale-105 shadow-md"
+                  >
+                    <Icon name="mingcute:whatsapp-line" class="w-5 h-5" />
+                    WhatsApp
+                  </a>
+                )}
+                {professional.contact_email && (
+                  <a
+                    href={`mailto:${professional.contact_email}`}
+                    class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-teal-base hover:bg-brand-teal-dark text-white rounded-full font-semibold transition-all transform hover:scale-105 shadow-md"
+                  >
+                    <Icon name="lucide:mail" class="w-5 h-5" />
+                    Email
+                  </a>
+                )}
+                {professional.contact_phone && (
+                  <a
+                    href={`tel:${professional.contact_phone}`}
+                    class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-purple-base hover:bg-brand-purple-dark text-white rounded-full font-semibold transition-all transform hover:scale-105 shadow-md"
+                  >
+                    <Icon name="lucide:phone" class="w-5 h-5" />
+                    Llamar
+                  </a>
+                )}
+                {professional.website && (
+                  <a
+                    href={professional.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-full font-semibold transition-all transform hover:scale-105"
+                  >
+                    <Icon name="lucide:globe" class="w-5 h-5" />
+                    Sitio web
+                  </a>
+                )}
+              </div>
+
+              <!-- Social Media Icons -->
+              {Object.keys(professional.social_media || {}).some(key => professional.social_media[key]) && (
+                <div class="flex justify-center gap-3 pt-4">
+                  {Object.entries(professional.social_media || {}).map(([platform, url]) => {
+                    if (!url || platform === 'id') return null;
+                    const config = socialMediaConfig[platform];
+                    if (!config) return null;
+                    
+                    return (
+                      <a
+                        key={platform}
+                        href={String(url)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="group inline-flex items-center justify-center w-11 h-11 bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                        title={config.label}
+                        style={`--brand-color: ${config.color}`}
+                      >
+                        <Icon 
+                          name={config.icon} 
+                          class="w-5 h-5 transition-all duration-300 group-hover:text-white"
+                          style={`background: transparent;`}
+                        />
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Bio Section -->
-  {professional.bio && (
-    <section class="py-20 bg-neutral-50 dark:bg-neutral-800">
-      <div class="section-container">
-        <div class="max-w-3xl">
-          <h2 class="text-3xl font-display font-bold text-neutral-900 dark:text-white mb-6">
-            Sobre mí
-          </h2>
-          <div class="prose dark:prose-invert max-w-none">
-            <p class="text-lg text-neutral-700 dark:text-neutral-300 leading-relaxed">
+      <!-- Bio Section -->
+      {professional.bio && (
+        <div class="bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700">
+          <div class="max-w-7xl mx-auto px-8 py-12">
+            <h2 class="text-2xl font-display font-bold text-neutral-900 dark:text-white mb-4 text-center">Acerca de mí</h2>
+            <p class="text-neutral-700 dark:text-neutral-300 leading-relaxed text-lg text-center">
               {professional.bio}
             </p>
           </div>
         </div>
-      </div>
-    </section>
-  )}
+      )}
 
-  <!-- LGBTQ+ Statement -->
-  {professional.lgbtq_friendly_statement && (
-    <section class="py-20 bg-white dark:bg-neutral-900">
-      <div class="section-container">
-        <div class="max-w-3xl mx-auto bg-gradient-to-r from-brand-teal-light/10 to-brand-purple-light/10 dark:from-brand-teal-dark/20 dark:to-brand-purple-dark/20 p-8 rounded-lg border-l-4 border-brand-teal-base">
-          <h2 class="text-2xl font-display font-bold text-neutral-900 dark:text-white mb-4 flex items-center gap-2">
-            <Icon name="lucide:heart" class="w-6 h-6 text-brand-teal-base" />
-            Nuestro compromiso LGBTQ+
-          </h2>
-          <p class="text-lg text-neutral-700 dark:text-neutral-300 leading-relaxed">
-            {professional.lgbtq_friendly_statement}
-          </p>
+      <!-- LGBTQ+ Statement -->
+      {professional.lgbtq_friendly_statement && (
+        <div class="bg-gradient-to-r from-brand-teal-light/5 to-brand-purple-light/5 dark:from-brand-teal-dark/10 dark:to-brand-purple-dark/10 border-b border-neutral-200 dark:border-neutral-700">
+          <div class="max-w-7xl mx-auto px-8 py-12">
+            <div class="bg-white dark:bg-neutral-800 p-8 rounded-lg border-l-4 border-brand-teal-base">
+              <p class="flex items-start gap-4 text-neutral-700 dark:text-neutral-300 text-lg">
+                <Icon name="lucide:heart" class="w-6 h-6 text-brand-teal-base flex-shrink-0 mt-1" />
+                <span>{professional.lgbtq_friendly_statement}</span>
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
-  )}
-
-  <!-- Social Media Links -->
-  {Object.keys(professional.social_media || {}).some(key => professional.social_media[key]) && (
-    <section class="py-16 bg-neutral-50 dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700">
-      <div class="section-container">
-        <h3 class="text-2xl font-display font-bold text-neutral-900 dark:text-white mb-6">
-          Conecta en redes sociales
-        </h3>
-        <div class="flex flex-wrap gap-4">
-          {Object.entries(professional.social_media || {}).map(([platform, url]) => {
-            if (!url || platform === 'id') return null;
-            const config = socialMediaConfig[platform];
-            if (!config) return null;
-            
-            return (
-              <a
-                key={platform}
-                href={String(url)}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-700 border-2 border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:border-brand-teal-base hover:text-brand-teal-base dark:hover:text-brand-teal-light rounded-lg font-medium transition-all"
-              >
-                <Icon name={config.icon} class="w-5 h-5" />
-                {config.label}
-              </a>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  )}
-
-  <!-- Back to Directory -->
-  <section class="py-12 bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700">
-    <div class="section-container">
-      <a
-        href="/directorio/"
-        class="inline-flex items-center gap-2 text-brand-teal-base hover:text-brand-teal-dark dark:hover:text-brand-teal-light font-medium transition-colors"
-      >
-        <Icon name="lucide:arrow-left" class="w-4 h-4" />
-        Volver al directorio
-      </a>
+      )}
     </div>
-  </section>
+
+  </div>
 
 </MainLayout>
+
+<style>
+  a[style*="--brand-color"]:hover {
+    background-color: var(--brand-color);
+  }
+
+  /* Pronoun color classes */
+  .pronoun-ella {
+    @apply bg-pink-200 text-pink-800 dark:bg-pink-900 dark:text-pink-200;
+  }
+
+  .pronoun-el {
+    @apply bg-blue-200 text-blue-800 dark:bg-blue-900 dark:text-blue-200;
+  }
+
+  .pronoun-neutral-orange {
+    @apply bg-orange-200 text-orange-800 dark:bg-orange-900 dark:text-orange-200;
+  }
+
+  .pronoun-neutral-green {
+    @apply bg-green-200 text-green-800 dark:bg-green-900 dark:text-green-200;
+  }
+
+  .pronoun-neutral-yellow {
+    @apply bg-yellow-200 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200;
+  }
+
+  .pronoun-neutral-purple {
+    @apply bg-purple-200 text-purple-800 dark:bg-purple-900 dark:text-purple-200;
+  }
+</style>

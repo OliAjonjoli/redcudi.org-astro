@@ -63,7 +63,7 @@ export async function getProfessionals() {
  */
 export async function getProfessionalBySlug(slug: string) {
   const response = await fetchAPI('/professionals', {
-    populate: ['photo', 'specializations', 'professions', 'social_media'],
+    populate: ['photo', 'specializations', 'professions', 'social_media', 'pronouns'],
     'filters[slug][$eq]': slug,
   });
   return response.data?.[0] || null;

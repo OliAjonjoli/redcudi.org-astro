@@ -1,5 +1,6 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
+import heroContactHeadset from '../assets/images/hero-contact-team.jpg';
 ---
 
 <MainLayout 
@@ -8,7 +9,7 @@ import MainLayout from '../layouts/MainLayout.astro';
   currentPage="/contact/"
 >
 
-  <section class="min-h-[60vh] flex items-center justify-center bg-cover bg-center bg-gradient-to-br from-brand-purple-dark via-brand-teal-base to-brand-green-dark pt-20 pb-12" style="background-image: linear-gradient(135deg, rgba(96, 87, 159, 0.95), rgba(31, 97, 141, 0.95), rgba(34, 139, 87, 0.95));">
+  <section class="min-h-[60vh] flex items-center justify-center bg-cover bg-center pt-20 pb-12" style={`background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('${heroContactHeadset.src}'); background-attachment: fixed;`}>
     <div class="section-container text-center">
       <h1 class="text-5xl md:text-6xl font-display font-bold text-white mb-6">
         Contacto
